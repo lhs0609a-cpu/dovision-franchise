@@ -24,13 +24,23 @@ export default function Header() {
     <header className="border-b border-border/50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="container-responsive flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center">
+          {/* 모바일 로고 */}
+          <Image
+            src="/images/dovision/mobile_top_logo.png"
+            alt="DOVISION 두비전"
+            width={120}
+            height={36}
+            priority
+            className="h-8 w-auto sm:hidden"
+          />
+          {/* 데스크톱 로고 */}
           <Image
             src="/images/dovision/top_logo.png"
             alt="DOVISION 두비전"
             width={160}
             height={40}
             priority
-            className="h-9 w-auto sm:h-10"
+            className="hidden h-10 w-auto sm:block"
           />
         </Link>
 

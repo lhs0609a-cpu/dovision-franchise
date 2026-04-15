@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Download } from "lucide-react";
@@ -9,17 +10,46 @@ const subBadges = ["MEMORY", "NEUROFEEDBACK", "BTS", "FRANCHISE"];
 export default function FullBleedCTA() {
   return (
     <section className="snap-section relative overflow-hidden bg-primary text-primary-foreground">
-      {/* Decorative radial glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(255,255,255,0.12),transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_90%,rgba(0,0,0,0.15),transparent_60%)]" />
+      {/* 배경 이미지 (image_08) */}
+      <Image
+        src="/images/dovision/image_08.png"
+        alt=""
+        aria-hidden
+        fill
+        sizes="100vw"
+        priority={false}
+        className="absolute inset-0 object-cover opacity-30 mix-blend-overlay"
+      />
+
+      {/* 그라디언트 오버레이 */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-primary/80 to-primary" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(255,255,255,0.15),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_90%,rgba(0,0,0,0.25),transparent_60%)]" />
 
       <div className="container-responsive relative z-10 flex flex-col items-center justify-center text-center">
+        {/* 상단 cue — image_09 */}
+        <motion.div
+          className="relative mb-6 aspect-[16/3] w-full max-w-[520px]"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <Image
+            src="/images/dovision/image_09.png"
+            alt="더 자세한 정보가 궁금하신가요?"
+            fill
+            sizes="(max-width: 768px) 100vw, 520px"
+            className="object-contain brightness-0 invert"
+          />
+        </motion.div>
+
         <motion.p
           className="text-[13px] font-semibold tracking-[0.2em] text-white/80 sm:text-[14px]"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
         >
           창의융합 뇌교육의 모든 것
         </motion.p>
@@ -29,7 +59,7 @@ export default function FullBleedCTA() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
+          transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
         >
           ALL ABOUT
           <br />
@@ -41,7 +71,7 @@ export default function FullBleedCTA() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.45 }}
         >
           {subBadges.map((label) => (
             <span
@@ -58,7 +88,7 @@ export default function FullBleedCTA() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.55 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
         >
           <Link
             href="/contact"

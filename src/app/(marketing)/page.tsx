@@ -11,6 +11,9 @@ import ContactForm from "@/components/marketing/ContactForm";
 import FullBleedCTA from "@/components/marketing/FullBleedCTA";
 import TrainingEffects from "@/components/marketing/TrainingEffects";
 import LearningProcess from "@/components/marketing/LearningProcess";
+import DominicStory from "@/components/marketing/DominicStory";
+import MemoryPrinciple from "@/components/marketing/MemoryPrinciple";
+import PatentBadge from "@/components/marketing/PatentBadge";
 
 const faqItems = [
   {
@@ -36,6 +39,12 @@ export default function HomePage() {
       {/* 2. 브랜드 소개 */}
       <BrandIntro />
 
+      {/* 2-1. 도미닉 오브라이언 스토리 */}
+      <DominicStory />
+
+      {/* 2-2. 이미지전환기억법 원리 */}
+      <MemoryPrinciple />
+
       {/* 3. 프로그램 하이라이트 */}
       <ProgramCards />
 
@@ -53,6 +62,9 @@ export default function HomePage() {
 
       {/* 6. 가맹 장점 */}
       <FranchiseBenefits />
+
+      {/* 6-1. 특허 독점권 */}
+      <PatentBadge />
 
       {/* 7. 비교 테이블 */}
       <ComparisonTable />
