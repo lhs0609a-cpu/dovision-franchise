@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Shield, Award, Brain, Lightbulb } from "lucide-react";
 
@@ -53,35 +54,31 @@ export default function BrandIntro() {
             </p>
           </motion.div>
 
-          {/* RIGHT — decorative purple geometric shapes (AssistFit-style) */}
-          <div className="relative hidden h-[420px] lg:block">
+          {/* RIGHT — 뇌 그래픽 이미지 + 퍼플 프레임 장식 */}
+          <div className="relative hidden h-[520px] lg:block">
             <motion.div
               aria-hidden
-              className="absolute right-0 top-4 h-[360px] w-[240px] bg-primary"
-              style={{ transform: "skewY(-8deg)" }}
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              className="absolute right-10 top-8 h-[460px] w-[340px] border-[10px] border-primary"
+              initial={{ opacity: 0, rotate: -6, scale: 0.95 }}
+              whileInView={{ opacity: 1, rotate: -3, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              transition={{ duration: 0.9, ease: "easeOut" }}
             />
             <motion.div
-              aria-hidden
-              className="absolute right-[140px] top-0 h-[380px] w-[200px] border-[12px] border-primary"
-              style={{ transform: "skewY(-6deg)" }}
+              className="absolute right-0 top-0 h-[480px] w-[380px] overflow-hidden rounded-[14px] shadow-2xl"
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
-            />
-            <motion.div
-              aria-hidden
-              className="absolute right-[280px] top-12 h-[320px] w-[180px] bg-primary/40"
-              style={{ transform: "skewY(-4deg)" }}
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-            />
+            >
+              <Image
+                src="/images/dovision/image_01.png"
+                alt="이미지전환기억법 뇌 그래픽"
+                fill
+                sizes="380px"
+                className="object-cover"
+              />
+            </motion.div>
           </div>
         </div>
 

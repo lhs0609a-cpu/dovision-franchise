@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Menu, X, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,10 +23,15 @@ export default function Header() {
   return (
     <header className="border-b border-border/50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="container-responsive flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-[22px] font-extrabold tracking-tight text-foreground">
-            DOVISION
-          </span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/images/dovision/top_logo.png"
+            alt="DOVISION 두비전"
+            width={160}
+            height={40}
+            priority
+            className="h-9 w-auto sm:h-10"
+          />
         </Link>
 
         <nav className="hidden items-center gap-0.5 lg:flex">

@@ -9,6 +9,8 @@ import InvestmentTable from "@/components/marketing/InvestmentTable";
 import FranchiseProcess from "@/components/marketing/FranchiseProcess";
 import ContactForm from "@/components/marketing/ContactForm";
 import FullBleedCTA from "@/components/marketing/FullBleedCTA";
+import TrainingEffects from "@/components/marketing/TrainingEffects";
+import LearningProcess from "@/components/marketing/LearningProcess";
 
 const faqItems = [
   {
@@ -37,8 +39,14 @@ export default function HomePage() {
       {/* 3. 프로그램 하이라이트 */}
       <ProgramCards />
 
+      {/* 3-1. 학습 프로세스 (이미지) */}
+      <LearningProcess />
+
       {/* 4. 성과 숫자 */}
       <CountingStats />
+
+      {/* 4-1. 트레이닝 전/후 비교 (이미지) */}
+      <TrainingEffects />
 
       {/* 5. 성과 사례 슬라이더 */}
       <SuccessSlider />
