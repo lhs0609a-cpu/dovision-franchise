@@ -6,95 +6,281 @@ import FranchiseBenefits from "@/components/marketing/FranchiseBenefits";
 import InvestmentTable from "@/components/marketing/InvestmentTable";
 import FranchiseProcess from "@/components/marketing/FranchiseProcess";
 import ComparisonTable from "@/components/marketing/ComparisonTable";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle,
+  User,
+  Target,
+  Users,
+  Briefcase,
+  Calendar,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  Calculator,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "가맹 안내",
-  description: "두비전 가맹점 창업 안내. 투자비, 수익 모델, 본사 지원, 가맹 절차 등 상세 정보.",
+  description:
+    "두비전 가맹점 창업 안내. 총 1억원 투자 구조, 본사 지원 체계, 오픈 프로세스, 타겟 가맹점주 프로필 등 상세 정보.",
 };
 
 const supports = {
   before: [
     "상권 분석 및 입지 선정 컨설팅",
     "인테리어 설계 및 시공 관리",
-    "장비(뉴로피드백 등) 세팅",
-    "2주 집중 교육 연수",
-    "교재 및 학습 콘텐츠 제공",
-    "오픈 마케팅 지원",
+    "뉴로피드백 장비 세팅 및 검수",
+    "2주 집중 교육 연수 (가맹점주 + 강사)",
+    "교재·학습 콘텐츠 및 앱 제공",
+    "오픈 마케팅 패키지 지원",
   ],
   after: [
     "슈퍼바이저 정기 방문 (월 1~2회)",
-    "신규 프로그램 업데이트",
-    "온라인 마케팅 지원",
-    "정기 교육 연수",
-    "운영 매뉴얼 및 가이드",
-    "학부모 상담 가이드",
+    "신규 프로그램·교재 지속 업데이트",
+    "본사 차원 온라인 마케팅 공동 진행",
+    "분기별 가맹점주 워크숍·정기 연수",
+    "운영 매뉴얼·학부모 상담 가이드 제공",
+    "성과 데이터 분석 및 컨설팅",
   ],
 };
+
+const idealProfiles = [
+  {
+    icon: Briefcase,
+    title: "교육업 경험자",
+    desc: "학원·과외·교습소 운영 경험이 있는 예비 창업자",
+  },
+  {
+    icon: Users,
+    title: "교육열 높은 학부모",
+    desc: "자녀 교육에 관심이 많고 직접 운영에 참여할 의지가 있는 분",
+  },
+  {
+    icon: Target,
+    title: "소자본 교육 창업 희망자",
+    desc: "검증된 교육 프로그램으로 안정적 창업을 원하는 분",
+  },
+  {
+    icon: User,
+    title: "기존 학원·교습소 운영자",
+    desc: "차별화 프로그램을 도입해 경쟁력을 확보하고자 하는 분",
+  },
+];
+
+const keyPoints = [
+  {
+    icon: ShieldCheck,
+    title: "특허 기반 독점권",
+    desc: "특허 이미지전환기억법으로 경쟁사 동일 프로그램 진입 차단. 지역 독점 영업권.",
+  },
+  {
+    icon: Calendar,
+    title: "25년 운영 노하우",
+    desc: "2001년부터 축적된 연구개발 + 직영 3개 센터의 실운영 데이터 이관.",
+  },
+  {
+    icon: Calculator,
+    title: "검증된 수익 모델",
+    desc: "6개월 선불 등록 기반, 회원 9명 이상 확보 시 월 순이익 300~500만원 구간 진입.",
+  },
+];
+
+const scheduleTable = [
+  { step: "D-60", title: "상담·계약", detail: "가맹 상담 → 사업성 검토 → 계약 체결" },
+  { step: "D-50", title: "상권 분석·입지 선정", detail: "본사 상권 컨설팅 + 임대차 계약" },
+  { step: "D-30", title: "인테리어·장비 셋업", detail: "시공 관리 + 뉴로피드백 장비 설치" },
+  { step: "D-14", title: "집중 교육 연수", detail: "가맹점주·강사 2주 집중 연수" },
+  { step: "D-0", title: "오픈", detail: "그랜드 오픈 + 오픈 마케팅 지원" },
+  { step: "D+30", title: "집중 SV 방문", detail: "오픈 첫 달 주 1회 슈퍼바이저 방문" },
+];
 
 export default function FranchisePage() {
   return (
     <div className="pb-20">
-      <section className="bg-gradient-to-br from-primary/5 to-primary/10 py-20">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+      {/* 히어로 */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-white to-primary/10 py-20">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,oklch(0.45_0.18_290_/_0.08),transparent_55%)]" />
+        <div className="container-responsive relative z-10 text-center">
           <SectionFadeIn>
-            <h1 className="text-4xl font-extrabold sm:text-5xl">가맹 안내</h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-              검증된 뇌교육 프랜차이즈, 두비전과 함께 교육 사업을 시작하세요
+            <span className="inline-block rounded-full bg-primary/10 px-5 py-2 text-[13px] font-semibold tracking-[0.15em] text-primary sm:text-sm">
+              FRANCHISE
+            </span>
+            <h1 className="mt-6 font-bold leading-[1.1] tracking-[-0.02em] text-[36px] sm:text-[52px] lg:text-[68px]">
+              검증된 뇌교육 프랜차이즈,
+              <br />
+              <span className="text-primary">두비전</span>과 함께
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-[15px] font-medium leading-[1.7] text-muted-foreground sm:text-[17px]">
+              25년 노하우와 특허 기술을 그대로 이전받아
+              <br className="hidden sm:inline" />
+              안정적인 교육 사업을 시작할 수 있습니다.
             </p>
-            <Link href="/contact" className="mt-6 inline-block">
-              <Button size="lg">
-                가맹 상담 신청 <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link href="/contact">
+                <Button
+                  size="lg"
+                  className="rounded-full px-8 py-6 text-[15px] font-bold"
+                >
+                  가맹 상담 신청
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <a href="tel:010-9717-3373">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="rounded-full border-border px-8 py-6 text-[15px] font-bold"
+                >
+                  <Phone className="mr-2 h-4 w-4" />
+                  010-9717-3373
+                </Button>
+              </a>
+            </div>
           </SectionFadeIn>
+
+          {/* 3개 핵심 포인트 */}
+          <div className="mx-auto mt-16 grid max-w-4xl gap-4 sm:grid-cols-3">
+            {keyPoints.map((p, i) => (
+              <SectionFadeIn key={p.title} delay={i * 0.1}>
+                <div className="h-full rounded-2xl border border-border/60 bg-card p-6 text-left">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <p.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-4 text-[16px] font-bold sm:text-[17px]">
+                    {p.title}
+                  </h3>
+                  <p className="mt-2 text-[13px] leading-[1.65] text-muted-foreground sm:text-[14px]">
+                    {p.desc}
+                  </p>
+                </div>
+              </SectionFadeIn>
+            ))}
+          </div>
         </div>
       </section>
 
+      {/* 타겟 가맹점주 */}
+      <section className="py-20">
+        <div className="container-responsive">
+          <SectionFadeIn>
+            <div className="text-center">
+              <p className="text-[13px] font-semibold tracking-[0.2em] text-primary sm:text-[14px]">
+                WHO FITS
+              </p>
+              <h2 className="mt-3 font-bold leading-[1.15] tracking-[-0.02em] text-[32px] sm:text-[44px] lg:text-[52px]">
+                어떤 분이 두비전과 잘 맞을까요?
+              </h2>
+              <p className="mx-auto mt-5 max-w-xl text-[15px] font-medium text-muted-foreground sm:text-[17px]">
+                교육 경험 유무보다 학생의 변화를 진심으로 응원하는 마음이
+                가장 중요합니다.
+              </p>
+            </div>
+          </SectionFadeIn>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {idealProfiles.map((p, i) => (
+              <SectionFadeIn key={p.title} delay={i * 0.08}>
+                <div className="group h-full rounded-2xl border border-border/60 bg-card p-6 transition-all hover:border-primary/40 hover:shadow-lg">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                    <p.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="mt-5 text-[16px] font-bold sm:text-[17px]">
+                    {p.title}
+                  </h3>
+                  <p className="mt-2 text-[13px] leading-[1.65] text-muted-foreground sm:text-[14px]">
+                    {p.desc}
+                  </p>
+                </div>
+              </SectionFadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 가맹 장점 (기존 컴포넌트) */}
       <FranchiseBenefits />
+
+      {/* 투자비 상세 (기존 컴포넌트) */}
       <InvestmentTable />
 
       {/* 로열티 구조 */}
-      <section className="py-16">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+      <section className="py-20">
+        <div className="container-responsive">
           <SectionFadeIn>
-            <h2 className="text-center text-3xl font-bold">로열티 구조</h2>
-            <div className="mt-8 rounded-xl border bg-card p-8">
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground">월 정액 로열티</p>
-                  <p className="mt-1 text-3xl font-bold text-primary">50만원</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    매출 무관 고정 금액
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground">광고 분담금</p>
-                  <p className="mt-1 text-3xl font-bold text-primary">10만원/월</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    온/오프라인 공동 마케팅
-                  </p>
-                </div>
-              </div>
+            <div className="text-center">
+              <p className="text-[13px] font-semibold tracking-[0.2em] text-primary sm:text-[14px]">
+                ROYALTY
+              </p>
+              <h2 className="mt-3 font-bold leading-[1.15] tracking-[-0.02em] text-[32px] sm:text-[44px] lg:text-[52px]">
+                투명한 로열티 구조
+              </h2>
+              <p className="mx-auto mt-5 max-w-xl text-[15px] font-medium text-muted-foreground sm:text-[17px]">
+                매출 비례가 아닌 정액제로, 가맹점의 성장을 본사가 함께
+                응원합니다.
+              </p>
             </div>
           </SectionFadeIn>
+          <div className="mx-auto mt-12 max-w-3xl rounded-2xl border border-border/60 bg-card p-8 sm:p-10">
+            <div className="grid gap-8 sm:grid-cols-2">
+              <div className="text-center">
+                <p className="text-[12px] font-semibold text-muted-foreground">
+                  월 정액 로열티
+                </p>
+                <p className="mt-2 text-[40px] font-extrabold text-primary sm:text-[48px]">
+                  50<span className="text-[20px]">만원</span>
+                </p>
+                <p className="mt-2 text-[12px] text-muted-foreground sm:text-[13px]">
+                  매출과 무관한 고정 금액
+                </p>
+              </div>
+              <div className="text-center sm:border-l sm:border-border/60 sm:pl-8">
+                <p className="text-[12px] font-semibold text-muted-foreground">
+                  광고 분담금
+                </p>
+                <p className="mt-2 text-[40px] font-extrabold text-primary sm:text-[48px]">
+                  10<span className="text-[20px]">만원/월</span>
+                </p>
+                <p className="mt-2 text-[12px] text-muted-foreground sm:text-[13px]">
+                  본사 공동 마케팅 집행
+                </p>
+              </div>
+            </div>
+            <p className="mt-8 border-t border-border/60 pt-6 text-center text-[12px] text-muted-foreground sm:text-[13px]">
+              * 교재·장비 공급가는 별도. 신규 프로그램 업데이트는 로열티에 포함.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* 본사 지원 */}
-      <section className="bg-muted/30 py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="bg-[oklch(0.97_0.005_290)] py-20">
+        <div className="container-responsive">
           <SectionFadeIn>
-            <h2 className="text-center text-3xl font-bold">본사 지원 내용</h2>
+            <div className="text-center">
+              <p className="text-[13px] font-semibold tracking-[0.2em] text-primary sm:text-[14px]">
+                HQ SUPPORT
+              </p>
+              <h2 className="mt-3 font-bold leading-[1.15] tracking-[-0.02em] text-[32px] sm:text-[44px] lg:text-[52px]">
+                본사가 이만큼 챙깁니다
+              </h2>
+            </div>
           </SectionFadeIn>
-          <div className="mt-12 grid gap-8 sm:grid-cols-2">
+          <div className="mt-12 grid gap-6 lg:grid-cols-2">
             <SectionFadeIn delay={0.1}>
-              <div className="rounded-xl border bg-card p-6">
-                <h3 className="text-lg font-bold text-primary">오픈 전 지원</h3>
-                <ul className="mt-4 space-y-3">
+              <div className="h-full rounded-2xl border border-border/60 bg-card p-8">
+                <div className="flex items-center gap-3">
+                  <span className="rounded-md bg-primary px-2.5 py-1 text-[11px] font-bold text-primary-foreground">
+                    OPEN 전
+                  </span>
+                  <h3 className="text-[20px] font-bold">오픈 전 지원</h3>
+                </div>
+                <ul className="mt-6 space-y-3">
                   {supports.before.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
+                    <li
+                      key={item}
+                      className="flex items-start gap-2 text-[14px] leading-[1.6] sm:text-[15px]"
+                    >
+                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                       {item}
                     </li>
                   ))}
@@ -102,12 +288,20 @@ export default function FranchisePage() {
               </div>
             </SectionFadeIn>
             <SectionFadeIn delay={0.2}>
-              <div className="rounded-xl border bg-card p-6">
-                <h3 className="text-lg font-bold text-primary">오픈 후 지원</h3>
-                <ul className="mt-4 space-y-3">
+              <div className="h-full rounded-2xl border border-border/60 bg-card p-8">
+                <div className="flex items-center gap-3">
+                  <span className="rounded-md bg-primary px-2.5 py-1 text-[11px] font-bold text-primary-foreground">
+                    OPEN 후
+                  </span>
+                  <h3 className="text-[20px] font-bold">오픈 후 지원</h3>
+                </div>
+                <ul className="mt-6 space-y-3">
                   {supports.after.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
+                    <li
+                      key={item}
+                      className="flex items-start gap-2 text-[14px] leading-[1.6] sm:text-[15px]"
+                    >
+                      <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                       {item}
                     </li>
                   ))}
@@ -118,28 +312,130 @@ export default function FranchisePage() {
         </div>
       </section>
 
+      {/* 비교 테이블 */}
       <ComparisonTable />
+
+      {/* 오픈 일정표 */}
+      <section className="py-20">
+        <div className="container-responsive">
+          <SectionFadeIn>
+            <div className="text-center">
+              <p className="text-[13px] font-semibold tracking-[0.2em] text-primary sm:text-[14px]">
+                TIMELINE
+              </p>
+              <h2 className="mt-3 font-bold leading-[1.15] tracking-[-0.02em] text-[32px] sm:text-[44px] lg:text-[52px]">
+                계약부터 오픈까지 60일
+              </h2>
+            </div>
+          </SectionFadeIn>
+          <div className="mx-auto mt-12 max-w-3xl">
+            {scheduleTable.map((s, i) => (
+              <SectionFadeIn key={s.step} delay={i * 0.06}>
+                <div className="relative flex gap-5 border-l-2 border-primary/30 py-5 pl-8">
+                  <div className="absolute -left-[7px] top-7 h-3 w-3 rounded-full bg-primary" />
+                  <div className="min-w-[60px]">
+                    <span className="text-[18px] font-extrabold text-primary">
+                      {s.step}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-[16px] font-bold sm:text-[17px]">{s.title}</p>
+                    <p className="mt-1 text-[13px] leading-[1.6] text-muted-foreground sm:text-[14px]">
+                      {s.detail}
+                    </p>
+                  </div>
+                </div>
+              </SectionFadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <FranchiseProcess />
 
-      {/* CTA */}
-      <section className="bg-primary py-16 text-primary-foreground">
-        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold">지금 바로 상담 신청하세요</h2>
-          <p className="mt-4 text-primary-foreground/80">
-            두비전의 검증된 교육 시스템으로 성공적인 교육 사업을 시작하세요.<br />
-            전문 상담사가 친절하게 안내해 드립니다.
+      {/* FAQ 미니 */}
+      <section className="bg-[oklch(0.97_0.005_290)] py-20">
+        <div className="container-responsive">
+          <SectionFadeIn>
+            <div className="text-center">
+              <p className="text-[13px] font-semibold tracking-[0.2em] text-primary sm:text-[14px]">
+                QUICK FAQ
+              </p>
+              <h2 className="mt-3 font-bold leading-[1.15] tracking-[-0.02em] text-[32px] sm:text-[44px] lg:text-[52px]">
+                가맹 문의 전 자주 묻는 질문
+              </h2>
+            </div>
+          </SectionFadeIn>
+          <div className="mx-auto mt-12 max-w-3xl space-y-4">
+            {[
+              {
+                q: "교육업 경험이 없어도 운영이 가능한가요?",
+                a: "네. 본사가 2주 집중 교육 연수를 통해 프로그램 이해부터 상담·회원 관리까지 전 과정을 교육합니다. 오픈 후에도 슈퍼바이저가 정기 방문해 운영 전반을 지원합니다.",
+              },
+              {
+                q: "초기 투자비는 어느 수준인가요?",
+                a: "30~35평 기준 총 1억원 규모입니다. 가입비 1,000만원, 인테리어 2,500~3,000만원, 집기·간판 3,000~3,500만원, 강의실 구성·교육 컨설팅 3,000만원. 임대보증금은 별도입니다.",
+              },
+              {
+                q: "손익분기점은 언제쯤 도달하나요?",
+                a: "지역과 운영에 따라 다르지만, 평균 3~6개월 내 BEP 도달이 일반적입니다. 회원 9명 이상부터는 월 순이익 300~500만원 구간에 진입합니다.",
+              },
+              {
+                q: "지역 독점권이 보장되나요?",
+                a: "네. 특허 기술 기반으로 동일 프로그램의 타 브랜드 진입이 제한되며, 가맹 계약 시 영업 지역을 별도 보호합니다.",
+              },
+            ].map((item) => (
+              <div
+                key={item.q}
+                className="rounded-2xl border border-border/60 bg-card p-6"
+              >
+                <h3 className="text-[15px] font-bold sm:text-[16px]">
+                  Q. {item.q}
+                </h3>
+                <p className="mt-3 text-[14px] leading-[1.75] text-muted-foreground sm:text-[15px]">
+                  A. {item.a}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 최종 CTA */}
+      <section className="bg-primary py-20 text-primary-foreground">
+        <div className="container-responsive text-center">
+          <h2 className="font-black leading-[1.1] tracking-[-0.02em] text-[32px] sm:text-[48px] lg:text-[60px]">
+            지금 바로 상담 신청하세요
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-[14px] leading-[1.7] text-white/80 sm:text-[16px]">
+            가맹 전담 매니저가 사업성 검토부터 오픈까지 1:1로 안내합니다.
+            부담 없이 문의 주세요.
           </p>
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/contact">
-              <Button size="lg" variant="secondary">
-                상담 신청하기 <ArrowRight className="ml-2 h-5 w-5" />
+              <Button
+                size="lg"
+                variant="secondary"
+                className="rounded-full px-8 py-6 text-[15px] font-bold"
+              >
+                상담 신청하기
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <a href="tel:02-558-2733">
-              <Button size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
-                전화 상담: 02-558-2733
+            <a href="tel:010-9717-3373">
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-full border-white/30 bg-white/5 px-8 py-6 text-[15px] font-bold text-white hover:bg-white/15"
+              >
+                <Phone className="mr-2 h-4 w-4" />
+                이윤진 매니저 · 010-9717-3373
               </Button>
             </a>
+          </div>
+          <div className="mt-10 inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-2.5 text-[12px] font-semibold text-white/80 backdrop-blur sm:text-[13px]">
+            <MapPin className="h-4 w-4" />
+            본사: 서울 강남구 역삼2동 775-2 초원빌딩 3층
           </div>
         </div>
       </section>
