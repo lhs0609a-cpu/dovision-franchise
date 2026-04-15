@@ -49,44 +49,48 @@
   --color-dovision: var(--dovision);
   --color-dovision-light: var(--dovision-light);
   --color-dovision-dark: var(--dovision-dark);
+  --color-dark: var(--color-dark);
+  --color-dark-card: var(--color-dark-card);
 }
 
 :root {
-  --background: oklch(1 0 0);
+  --background: oklch(0.97 0.002 280);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.55 0.2 250);
+  --primary: oklch(0.45 0.18 290);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0.005 250);
+  --secondary: oklch(0.97 0.005 290);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.95 0.02 250);
+  --accent: oklch(0.95 0.03 290);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.55 0.2 250);
-  --chart-1: oklch(0.55 0.2 250);
+  --ring: oklch(0.45 0.18 290);
+  --chart-1: oklch(0.45 0.18 290);
   --chart-2: oklch(0.65 0.18 160);
-  --chart-3: oklch(0.7 0.15 50);
+  --chart-3: oklch(0.68 0.13 290);
   --chart-4: oklch(0.6 0.2 300);
   --chart-5: oklch(0.75 0.1 80);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.55 0.2 250);
+  --sidebar-primary: oklch(0.45 0.18 290);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.95 0.02 250);
+  --sidebar-accent: oklch(0.95 0.03 290);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.55 0.2 250);
-  --dovision: oklch(0.55 0.2 250);
-  --dovision-light: oklch(0.7 0.15 250);
-  --dovision-dark: oklch(0.4 0.2 250);
+  --sidebar-ring: oklch(0.45 0.18 290);
+  --dovision: oklch(0.45 0.18 290);
+  --dovision-light: oklch(0.68 0.13 290);
+  --dovision-dark: oklch(0.28 0.15 290);
+  --color-dark: oklch(0.18 0.02 290);
+  --color-dark-card: oklch(0.24 0.03 290);
 }
 
 @layer base {
@@ -98,5 +102,45 @@
   }
   html {
     @apply font-sans scroll-smooth;
+  }
+}
+
+/* Snap scroll for marketing pages */
+.snap-container {
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.snap-section {
+  min-height: 100dvh;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Container responsive like AssistFit */
+.container-responsive {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }

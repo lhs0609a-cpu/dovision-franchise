@@ -2,90 +2,108 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-white to-primary/10 py-20 sm:py-28 lg:py-36">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(59,130,246,0.08),transparent_50%)]" />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-              가맹점주 모집 중
-            </span>
-          </motion.div>
+    <section className="snap-section relative overflow-hidden bg-[oklch(0.97_0.005_290)]">
+      {/* Background gradient + subtle radial */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-white to-primary/10" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,oklch(0.45_0.18_290_/_0.08),transparent_55%)]" />
 
-          <motion.h1
-            className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-          >
-            <span className="text-primary">두비전</span>과 함께
-            <br />
-            <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              교육의 미래
-            </span>
-            를 여세요
-          </motion.h1>
+      {/* Decorative purple frame — AssistFit-style */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-0 hidden -translate-x-1/2 -translate-y-[54%] border-[10px] border-primary lg:block"
+        style={{ width: "min(860px, 70vw)", height: "min(520px, 60vh)" }}
+        initial={{ opacity: 0, rotate: -2, scale: 0.95 }}
+        animate={{ opacity: 1, rotate: -1.5, scale: 1 }}
+        transition={{ duration: 0.9, ease: "easeOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-0 hidden -translate-x-[48%] -translate-y-[52%] border-[10px] border-primary/50 lg:block"
+        style={{ width: "min(820px, 66vw)", height: "min(500px, 58vh)" }}
+        initial={{ opacity: 0, rotate: 3, scale: 0.95 }}
+        animate={{ opacity: 1, rotate: 2, scale: 1 }}
+        transition={{ duration: 0.9, delay: 0.15, ease: "easeOut" }}
+      />
 
-          <motion.p
-            className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            25년 노하우의 창의융합 뇌교육 프로그램.
-            <br className="hidden sm:inline" />
-            특허 보유 이미지전환기억법으로 검증된 수익 모델.
-          </motion.p>
+      <div className="container-responsive relative z-10 flex flex-col items-center justify-center text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+        >
+          <span className="inline-block rounded-full bg-primary/10 px-5 py-2 text-[13px] font-semibold tracking-wide text-primary sm:text-sm">
+            창의융합 뇌교육 플랫폼
+          </span>
+        </motion.div>
 
-          <motion.div
-            className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <Link href="/contact">
-              <Button size="lg" className="text-base">
-                무료 상담 신청
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="/franchise">
-              <Button variant="outline" size="lg" className="text-base">
-                <Play className="mr-2 h-5 w-5" />
-                가맹 안내 보기
-              </Button>
-            </Link>
-          </motion.div>
+        <motion.h1
+          className="mt-7 font-medium leading-[1.08] tracking-[-0.02em] break-keep text-[40px] sm:text-[56px] lg:text-[72px] xl:text-[84px]"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeInOut" }}
+        >
+          뇌교육 프랜차이즈,
+          <br />
+          <span className="font-black text-primary">두비전</span>
+          <span className="font-black">입니다.</span>
+        </motion.h1>
 
-          <motion.div
-            className="mt-12 flex flex-wrap justify-center gap-8 text-sm text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+        <motion.p
+          className="mx-auto mt-6 max-w-2xl text-[15px] font-medium leading-[1.65] text-muted-foreground break-keep sm:text-[17px] lg:text-[19px]"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4, ease: "easeInOut" }}
+        >
+          교육 비즈니스를 성공으로 이끌기 위해
+          <br className="hidden sm:inline" />
+          검증된 서비스를 제공합니다.
+        </motion.p>
+
+        <motion.div
+          className="mt-10 flex flex-col items-center gap-3 sm:flex-row"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6, ease: "easeInOut" }}
+        >
+          <Link
+            href="/contact"
+            className="group flex items-center gap-2 rounded-[8px] bg-foreground px-7 py-3.5 text-[14px] font-semibold text-background transition-colors hover:bg-primary sm:px-8 sm:text-[15px]"
           >
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500" />
-              직영 3개 센터 운영 중
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500" />
-              특허 보유 기술
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500" />
-              BEP 3~6개월
-            </div>
-          </motion.div>
-        </div>
+            무료 상담 신청
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+          <Link
+            href="/franchise"
+            className="flex items-center gap-2 rounded-[8px] border border-border bg-white px-7 py-3.5 text-[14px] font-semibold transition-colors hover:border-foreground sm:px-8 sm:text-[15px]"
+          >
+            가맹 안내 보기
+          </Link>
+        </motion.div>
+
+        {/* Trust badges */}
+        <motion.div
+          className="mt-14 flex flex-wrap justify-center gap-6 text-[13px] text-muted-foreground sm:gap-10 sm:text-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-primary" />
+            직영 3개 센터 운영 중
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-primary" />
+            특허 보유 기술
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-primary" />
+            BEP 3~6개월
+          </div>
+        </motion.div>
       </div>
     </section>
   );

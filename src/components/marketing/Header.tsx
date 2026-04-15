@@ -20,21 +20,20 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="border-b border-border/50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+      <div className="container-responsive flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl font-extrabold text-primary">DOVISION</span>
-          <span className="hidden text-sm text-muted-foreground sm:inline">
-            두비전 가맹
+          <span className="text-[22px] font-extrabold tracking-tight text-foreground">
+            DOVISION
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center gap-0.5 lg:flex">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
+              className="rounded-md px-3.5 py-2 text-[14px] font-medium text-foreground/70 transition-colors hover:text-primary"
             >
               {item.label}
             </Link>
@@ -43,15 +42,15 @@ export default function Header() {
 
         <div className="flex items-center gap-2">
           <a href="tel:02-558-2733" className="hidden sm:block">
-            <Button variant="outline" size="sm">
-              <Phone className="mr-1 h-4 w-4" />
-              02-558-2733
-            </Button>
+            <button className="flex items-center gap-1.5 rounded-[8px] border border-border bg-white px-4 py-2 text-[13px] font-semibold text-foreground transition-colors hover:border-foreground">
+              <Phone className="h-3.5 w-3.5" />
+              전화 상담
+            </button>
           </a>
-          <Link href="/contact">
-            <Button size="sm" className="hidden sm:inline-flex">
-              상담 신청
-            </Button>
+          <Link href="/contact" className="hidden sm:block">
+            <button className="rounded-[8px] bg-foreground px-5 py-2 text-[13px] font-semibold text-background transition-colors hover:bg-primary">
+              문의하기
+            </button>
           </Link>
 
           <Sheet open={open} onOpenChange={setOpen}>
@@ -68,7 +67,7 @@ export default function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="rounded-md px-4 py-3 text-base font-medium transition-colors hover:bg-accent"
+                    className="rounded-md px-4 py-3 text-base font-medium transition-colors hover:bg-accent hover:text-primary"
                   >
                     {item.label}
                   </Link>
@@ -81,7 +80,9 @@ export default function Header() {
                     </Button>
                   </a>
                   <Link href="/contact" onClick={() => setOpen(false)}>
-                    <Button className="w-full">상담 신청</Button>
+                    <button className="w-full rounded-[10px] bg-foreground px-5 py-2.5 text-sm font-semibold text-background transition-colors hover:bg-primary">
+                      문의하기
+                    </button>
                   </Link>
                 </div>
               </nav>
