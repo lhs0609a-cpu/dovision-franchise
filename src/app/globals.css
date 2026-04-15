@@ -110,11 +110,12 @@
   height: 100dvh;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
+  scroll-padding-top: 108px;
   -webkit-overflow-scrolling: touch;
 }
 
 .snap-section {
-  min-height: 100dvh;
+  min-height: calc(100dvh - 108px);
   scroll-snap-align: start;
   display: flex;
   flex-direction: column;

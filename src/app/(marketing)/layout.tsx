@@ -14,7 +14,7 @@ export default function MarketingLayout({
         <TopBanner />
         <Header />
       </div>
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pt-[108px]">{children}</main>
       <Footer />
       <FloatingCTA />
     </div>

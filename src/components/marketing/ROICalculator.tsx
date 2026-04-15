@@ -16,22 +16,22 @@ import {
 } from "recharts";
 
 export default function ROICalculator() {
-  const [students, setStudents] = useState(20);
-  const [fee, setFee] = useState(40);
-  const [rent, setRent] = useState(150);
+  const [students, setStudents] = useState(15);
+  const [fee, setFee] = useState(80);
+  const [fixedCost, setFixedCost] = useState(1000);
+
+  const INITIAL_INVESTMENT = 10000;
 
   const data = useMemo(() => {
-    const monthlyRevenue = students * fee;
-    const monthlyCost = rent + 50 + students * 5;
-    const monthlyProfit = monthlyRevenue - monthlyCost;
-    const initialInvestment = 5000;
-
-    let cumulative = -initialInvestment;
+    let cumulative = -INITIAL_INVESTMENT;
     return Array.from({ length: 12 }, (_, i) => {
       const month = i + 1;
-      const currentStudents = Math.min(students, Math.floor(students * (0.3 + 0.7 * (month / 6))));
+      const currentStudents = Math.min(
+        students,
+        Math.floor(students * (0.3 + 0.7 * (month / 6)))
+      );
       const rev = currentStudents * fee;
-      const cost = rent + 50 + currentStudents * 5;
+      const cost = fixedCost;
       const profit = rev - cost;
       cumulative += profit;
 
@@ -43,10 +43,10 @@ export default function ROICalculator() {
         누적: cumulative,
       };
     });
-  }, [students, fee, rent]);
+  }, [students, fee, fixedCost]);
 
   const bepMonth = data.findIndex((d) => d.누적 >= 0) + 1;
-  const monthlyProfit = students * fee - (rent + 50 + students * 5);
+  const monthlyProfit = students * fee - fixedCost;
 
   return (
     <div className="space-y-6">
@@ -60,43 +60,50 @@ export default function ROICalculator() {
               <Label>목표 회원 수: {students}명</Label>
               <Input
                 type="range"
-                min={10}
-                max={60}
+                min={5}
+                max={30}
                 value={students}
                 onChange={(e) => setStudents(Number(e.target.value))}
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>10명</span>
-                <span>60명</span>
+                <span>5명</span>
+                <span>30명</span>
               </div>
             </div>
             <div className="space-y-2">
-              <Label>월 수강료: {fee}만원</Label>
+              <Label>1인 월 수강료: {fee}만원</Label>
               <Input
                 type="range"
-                min={20}
-                max={60}
+                min={50}
+                max={120}
                 value={fee}
                 onChange={(e) => setFee(Number(e.target.value))}
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>20만원</span>
-                <span>60만원</span>
+                <span>50만원</span>
+                <span>120만원</span>
               </div>
+              <p className="text-[11px] text-muted-foreground">
+                6개월 선불 {(fee * 6).toLocaleString()}만원 기준
+              </p>
             </div>
             <div className="space-y-2">
-              <Label>월 임대료: {rent}만원</Label>
+              <Label>월 고정 지출: {fixedCost.toLocaleString()}만원</Label>
               <Input
                 type="range"
-                min={50}
-                max={400}
-                value={rent}
-                onChange={(e) => setRent(Number(e.target.value))}
+                min={500}
+                max={2000}
+                step={50}
+                value={fixedCost}
+                onChange={(e) => setFixedCost(Number(e.target.value))}
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>50만원</span>
-                <span>400만원</span>
+                <span>500만원</span>
+                <span>2,000만원</span>
               </div>
+              <p className="text-[11px] text-muted-foreground">
+                임대+인건비+마케팅+기타 합계
+              </p>
             </div>
           </div>
         </CardContent>
