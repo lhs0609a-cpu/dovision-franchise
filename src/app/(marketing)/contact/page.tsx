@@ -33,22 +33,13 @@ export default function ContactPage() {
                 <div className="space-y-6">
                   <h3 className="text-lg font-bold">다른 방법으로 문의하기</h3>
                   <div className="space-y-4">
-                    <a href="tel:02-558-2733" className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-accent">
+                    <a href="tel:0507-1434-3226" className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-accent">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <Phone className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="font-medium">전화 상담</p>
-                        <p className="text-sm text-muted-foreground">02-558-2733</p>
-                      </div>
-                    </a>
-                    <a href="tel:031-758-2758" className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-accent">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <Phone className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="font-medium">대표 전화</p>
-                        <p className="text-sm text-muted-foreground">031-758-2758</p>
+                        <p className="font-medium">가맹 전담 상담</p>
+                        <p className="text-sm text-muted-foreground">0507-1434-3226</p>
                       </div>
                     </a>
                     <div className="flex items-center gap-3 rounded-lg border bg-card p-4">
@@ -57,7 +48,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <p className="font-medium">이메일</p>
-                        <p className="text-sm text-muted-foreground">info@dovision.kr</p>
+                        <p className="text-sm text-muted-foreground">lhs0609c@naver.com</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 rounded-lg border bg-card p-4">

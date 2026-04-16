@@ -56,7 +56,7 @@ export default function ContactForm({ compact = false }: ContactFormProps) {
           빠른 시간 내에 담당자가 연락 드리겠습니다.
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          전화: 02-558-2733 | 카카오톡 상담 가능
+          전화: 0507-1434-3226 | 카카오톡 상담 가능
         </p>
       </div>
     );

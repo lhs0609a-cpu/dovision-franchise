@@ -20,19 +20,15 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="mb-3 font-semibold">연락처</h4>
+            <h4 className="mb-3 font-semibold">가맹 전담 연락처</h4>
             <div className="space-y-2 text-sm text-background/70">
-              <a href="tel:02-558-2733" className="flex items-center gap-2 hover:text-background">
+              <a href="tel:0507-1434-3226" className="flex items-center gap-2 hover:text-background">
                 <Phone className="h-4 w-4" />
-                02-558-2733
+                0507-1434-3226
               </a>
-              <a href="tel:031-758-2758" className="flex items-center gap-2 hover:text-background">
-                <Phone className="h-4 w-4" />
-                031-758-2758
-              </a>
-              <a href="mailto:info@dovision.kr" className="flex items-center gap-2 hover:text-background">
+              <a href="mailto:lhs0609c@naver.com" className="flex items-center gap-2 hover:text-background">
                 <Mail className="h-4 w-4" />
-                info@dovision.kr
+                lhs0609c@naver.com
               </a>
               <div className="flex items-start gap-2">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0" />

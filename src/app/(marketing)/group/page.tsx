@@ -961,11 +961,11 @@ export default function GroupPage() {
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
             <a
-              href="tel:010-9717-3373"
+              href="tel:0507-1434-3226"
               className="flex items-center gap-2 rounded-full border border-white/40 bg-white/5 px-8 py-4 text-[15px] font-bold text-white backdrop-blur transition-colors hover:bg-white/15"
             >
               <Phone className="h-4 w-4" />
-              이윤진 매니저 · 010-9717-3373
+              가맹 전담 매니저 · 0507-1434-3226
             </a>
           </div>
         </div>

@@ -132,14 +132,14 @@ export default function FranchisePage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <a href="tel:010-9717-3373">
+              <a href="tel:0507-1434-3226">
                 <Button
                   variant="outline"
                   size="lg"
                   className="rounded-full border-border px-8 py-6 text-[15px] font-bold"
                 >
                   <Phone className="mr-2 h-4 w-4" />
-                  010-9717-3373
+                  0507-1434-3226
                 </Button>
               </a>
             </div>
@@ -587,14 +587,14 @@ export default function FranchisePage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <a href="tel:010-9717-3373">
+            <a href="tel:0507-1434-3226">
               <Button
                 size="lg"
                 variant="outline"
                 className="rounded-full border-white/30 bg-white/5 px-8 py-6 text-[15px] font-bold text-white hover:bg-white/15"
               >
                 <Phone className="mr-2 h-4 w-4" />
-                이윤진 매니저 · 010-9717-3373
+                가맹 전담 매니저 · 0507-1434-3226
               </Button>
             </a>
           </div>

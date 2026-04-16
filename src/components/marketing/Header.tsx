@@ -58,7 +58,7 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <a href="tel:02-558-2733" className="hidden sm:block">
+          <a href="tel:0507-1434-3226" className="hidden sm:block">
             <button className="flex items-center gap-1.5 rounded-[8px] border border-border bg-white px-4 py-2 text-[13px] font-semibold text-foreground transition-colors hover:border-foreground">
               <Phone className="h-3.5 w-3.5" />
               전화 상담
@@ -90,7 +90,7 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="mt-4 space-y-2 px-4">
-                  <a href="tel:02-558-2733" className="block">
+                  <a href="tel:0507-1434-3226" className="block">
                     <Button variant="outline" className="w-full">
                       <Phone className="mr-2 h-4 w-4" />
                       전화 상담

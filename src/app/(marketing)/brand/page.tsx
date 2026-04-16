@@ -443,10 +443,10 @@ export default function BrandPage() {
                   <div className="mt-3 flex items-center gap-2 text-[13px] sm:text-[14px]">
                     <Phone className="h-4 w-4 text-primary" />
                     <a
-                      href="tel:031-758-2758"
+                      href="tel:0507-1434-3226"
                       className="font-semibold transition-colors hover:text-primary"
                     >
-                      031-758-2758
+                      0507-1434-3226
                     </a>
                   </div>
                 </div>
@@ -479,14 +479,14 @@ export default function BrandPage() {
                   <Phone className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
                     <p className="text-[12px] uppercase tracking-wider text-background/50">전화</p>
-                    <p className="mt-1">031-758-2758</p>
+                    <p className="mt-1">0507-1434-3226</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <Mail className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
                     <p className="text-[12px] uppercase tracking-wider text-background/50">이메일</p>
-                    <p className="mt-1">kinessking@naver.com</p>
+                    <p className="mt-1">lhs0609c@naver.com</p>
                   </div>
                 </li>
               </ul>
@@ -509,11 +509,11 @@ export default function BrandPage() {
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <a
-                    href="tel:010-9717-3373"
+                    href="tel:0507-1434-3226"
                     className="flex items-center justify-between rounded-xl border border-background/30 px-6 py-4 text-[14px] font-bold transition-colors hover:bg-background/10 sm:text-[15px]"
                   >
-                    가맹 전담 매니저 · 이윤진
-                    <span className="text-primary">010-9717-3373</span>
+                    가맹 전담 매니저
+                    <span className="text-primary">0507-1434-3226</span>
                   </a>
                 </div>
               </div>
