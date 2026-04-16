@@ -27,25 +27,19 @@ export default function FullBleedCTA() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_90%,rgba(0,0,0,0.25),transparent_60%)]" />
 
       <div className="container-responsive relative z-10 flex flex-col items-center justify-center text-center">
-        {/* 상단 cue — image_09 */}
-        <motion.div
-          className="relative mb-6 aspect-[16/3] w-full max-w-[520px]"
+        {/* 상단 cue — 텍스트 카피 */}
+        <motion.p
+          className="text-[20px] font-bold text-white sm:text-[28px] lg:text-[32px]"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <Image
-            src="/images/dovision/image_09.png"
-            alt="더 자세한 정보가 궁금하신가요?"
-            fill
-            sizes="(max-width: 768px) 100vw, 520px"
-            className="object-contain brightness-0 invert"
-          />
-        </motion.div>
+          더 자세한 정보가 궁금하신가요?
+        </motion.p>
 
         <motion.p
-          className="text-[13px] font-semibold tracking-[0.2em] text-white/80 sm:text-[14px]"
+          className="mt-5 text-[13px] font-semibold tracking-[0.2em] text-white/80 sm:text-[14px]"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

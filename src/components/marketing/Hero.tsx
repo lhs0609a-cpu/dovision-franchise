@@ -14,16 +14,16 @@ export default function Hero() {
       {/* Decorative purple frame — AssistFit-style */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-0 hidden -translate-x-1/2 -translate-y-[54%] border-[10px] border-primary lg:block"
-        style={{ width: "min(860px, 70vw)", height: "min(520px, 60vh)" }}
+        className="pointer-events-none absolute left-1/2 top-[46%] -z-0 hidden -translate-x-1/2 -translate-y-1/2 border-[10px] border-primary lg:block"
+        style={{ width: "min(960px, 78vw)", height: "min(600px, 66vh)" }}
         initial={{ opacity: 0, rotate: -2, scale: 0.95 }}
         animate={{ opacity: 1, rotate: -1.5, scale: 1 }}
         transition={{ duration: 0.9, ease: "easeOut" }}
       />
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-0 hidden -translate-x-[48%] -translate-y-[52%] border-[10px] border-primary/50 lg:block"
-        style={{ width: "min(820px, 66vw)", height: "min(500px, 58vh)" }}
+        className="pointer-events-none absolute left-1/2 top-[46%] -z-0 hidden -translate-x-[48%] -translate-y-1/2 border-[10px] border-primary/50 lg:block"
+        style={{ width: "min(920px, 74vw)", height: "min(580px, 64vh)" }}
         initial={{ opacity: 0, rotate: 3, scale: 0.95 }}
         animate={{ opacity: 1, rotate: 2, scale: 1 }}
         transition={{ duration: 0.9, delay: 0.15, ease: "easeOut" }}
@@ -84,9 +84,9 @@ export default function Hero() {
           </Link>
         </motion.div>
 
-        {/* Trust badges */}
+        {/* Trust badges — 프레임 밖 하단 */}
         <motion.div
-          className="mt-14 flex flex-wrap justify-center gap-6 text-[13px] text-muted-foreground sm:gap-10 sm:text-sm"
+          className="mt-20 flex flex-wrap justify-center gap-6 rounded-full bg-white/70 px-6 py-3 text-[13px] text-muted-foreground shadow-sm backdrop-blur sm:mt-24 sm:gap-10 sm:text-sm lg:mt-28"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
