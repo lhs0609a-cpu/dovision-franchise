@@ -109,7 +109,8 @@
 .snap-container {
   height: 100dvh;
   overflow-y: auto;
-  scroll-snap-type: y mandatory;
+  /* proximity: 마지막 섹션 이후 Footer가 가려지지 않도록 유연한 스냅 */
+  scroll-snap-type: y proximity;
   scroll-padding-top: 108px;
   -webkit-overflow-scrolling: touch;
 }
@@ -117,6 +118,8 @@
 .snap-section {
   min-height: calc(100dvh - 108px);
   scroll-snap-align: start;
+  /* 마지막 섹션에서 Footer로 자연 스크롤 가능하도록 stop 해제 */
+  scroll-snap-stop: normal;
   display: flex;
   flex-direction: column;
   justify-content: center;
