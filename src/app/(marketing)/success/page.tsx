@@ -4,7 +4,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import SectionFadeIn from "@/components/marketing/SectionFadeIn";
 import { Card, CardContent } from "@/components/ui/card";
-import { Quote, TrendingUp, ArrowRight, GraduationCap } from "lucide-react";
+import { Quote, TrendingUp, ArrowRight, GraduationCap, PlayCircle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "성과 사례",
@@ -152,6 +152,47 @@ export default async function SuccessPage() {
               <br className="hidden sm:inline" />
               학년별 기억량 2~6배 증가, IQ 25점 상승, 명문대 합격까지.
             </p>
+
+            {/* 헤드라인 3대 지표 */}
+            <div className="mx-auto mt-12 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl border border-border/50 bg-white/70 p-5 backdrop-blur">
+                <p className="text-[11px] font-bold tracking-[0.15em] text-muted-foreground">
+                  기억 용량
+                </p>
+                <p className="mt-2 text-[24px] font-extrabold sm:text-[28px]">
+                  <span className="text-muted-foreground/60 line-through">7개</span>
+                  <span className="mx-2 text-muted-foreground">→</span>
+                  <span className="text-primary">30~50개</span>
+                </p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  일반인 대비 4~7배
+                </p>
+              </div>
+              <div className="rounded-2xl border border-border/50 bg-white/70 p-5 backdrop-blur">
+                <p className="text-[11px] font-bold tracking-[0.15em] text-muted-foreground">
+                  학습 시간
+                </p>
+                <p className="mt-2 text-[24px] font-extrabold sm:text-[28px]">
+                  <span className="text-muted-foreground/60 line-through">10시간</span>
+                  <span className="mx-2 text-muted-foreground">→</span>
+                  <span className="text-primary">1시간</span>
+                </p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  동일 분량 학습 시
+                </p>
+              </div>
+              <div className="rounded-2xl border border-border/50 bg-white/70 p-5 backdrop-blur">
+                <p className="text-[11px] font-bold tracking-[0.15em] text-muted-foreground">
+                  기본 습득 기간
+                </p>
+                <p className="mt-2 text-[24px] font-extrabold sm:text-[28px]">
+                  <span className="text-primary">6개월</span>
+                </p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  주 1회 수업 기준
+                </p>
+              </div>
+            </div>
           </SectionFadeIn>
         </div>
       </section>
@@ -263,8 +304,49 @@ export default async function SuccessPage() {
         </div>
       </section>
 
-      {/* 학생 후기 카드 */}
+      {/* 두비전 공식 영상 */}
       <section className="py-20">
+        <div className="container-responsive">
+          <SectionFadeIn>
+            <div className="text-center">
+              <p className="text-[13px] font-semibold tracking-[0.2em] text-primary sm:text-[14px]">
+                OFFICIAL VIDEO
+              </p>
+              <h2 className="mt-3 font-bold leading-[1.15] tracking-[-0.02em] text-[32px] sm:text-[44px] lg:text-[52px]">
+                두비전 학습법 공식 영상
+              </h2>
+              <p className="mx-auto mt-5 max-w-xl text-[15px] font-medium text-muted-foreground sm:text-[17px]">
+                이미지전환기억법을 실제 과목(세계사)에 적용하는 과정을 직접
+                확인하세요
+              </p>
+            </div>
+          </SectionFadeIn>
+
+          <SectionFadeIn delay={0.1}>
+            <div className="mx-auto mt-12 max-w-4xl">
+              <div className="relative aspect-video overflow-hidden rounded-[20px] border border-border/50 bg-black shadow-xl">
+                <iframe
+                  src="https://www.youtube.com/embed/PHOVnP8s7mk?rel=0"
+                  title="두비전 | 세계사 공부 방법론"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full"
+                />
+              </div>
+              <div className="mt-4 flex items-center justify-center gap-2 text-[12px] text-muted-foreground sm:text-[13px]">
+                <PlayCircle className="h-4 w-4 text-primary" />
+                <span>
+                  두비전 공식 · 세계사 공부 방법론 (이미지전환기억법 적용 예시)
+                </span>
+              </div>
+            </div>
+          </SectionFadeIn>
+        </div>
+      </section>
+
+      {/* 학생 후기 카드 */}
+      <section className="bg-[oklch(0.97_0.005_290)] py-20">
         <div className="container-responsive">
           <SectionFadeIn>
             <div className="text-center">

@@ -21,6 +21,9 @@ import {
   Dna,
   Network,
   Megaphone,
+  Award,
+  Tv,
+  Building2,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -139,6 +142,26 @@ export default function FranchisePage() {
                   010-9717-3373
                 </Button>
               </a>
+            </div>
+
+            {/* 신뢰 뱃지 바 */}
+            <div className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-3 text-[11px] font-semibold text-muted-foreground sm:text-[12px]">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-white/70 px-4 py-1.5 backdrop-blur">
+                <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                특허 제10-1994856호
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-white/70 px-4 py-1.5 backdrop-blur">
+                <Award className="h-3.5 w-3.5 text-primary" />
+                소상공인진흥공단 우수 프랜차이즈 (2018)
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-white/70 px-4 py-1.5 backdrop-blur">
+                <Tv className="h-3.5 w-3.5 text-primary" />
+                KBS·MBC·SBS 방영
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-white/70 px-4 py-1.5 backdrop-blur">
+                <Building2 className="h-3.5 w-3.5 text-primary" />
+                ㈜키네스 그룹 · 27년
+              </span>
             </div>
           </SectionFadeIn>
 

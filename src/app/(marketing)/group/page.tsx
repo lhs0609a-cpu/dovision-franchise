@@ -14,6 +14,9 @@ import {
   GraduationCap,
   HeartHandshake,
   Trophy,
+  FileText,
+  BookOpen,
+  Lightbulb,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -30,50 +33,83 @@ const groupStats = [
   { value: "2개", label: "전문 브랜드" },
 ];
 
-// 통합 연혁 타임라인
+// 통합 연혁 타임라인 (kiness.co.kr/html/history 검증 기반)
 const timeline = [
   {
     year: "1999",
     brand: "KINESS",
-    event: "㈜키네스 설립 · 아동 성장관리 프로그램 연구 시작",
-    milestone: true,
-  },
-  {
-    year: "2001",
-    brand: "DOVISION",
-    event: "뇌교육 프로그램 연구·개발 착수 (두비전 전신)",
+    event: "㈜키네스(KEPC) 설립 · 아동 성장관리 프로그램 연구 시작",
     milestone: true,
   },
   {
     year: "2005",
-    brand: "DOVISION",
-    event: "이미지전환기억법 특허 등록",
-  },
-  {
-    year: "2010",
-    brand: "DOVISION",
-    event: "뉴로피드백 트레이닝 프로그램 도입",
-  },
-  {
-    year: "2015",
     brand: "KINESS",
-    event: "해외 진출 — 베트남 하노이점 오픈",
+    event: "부산·부천·성북·일산·평촌·목동 5개 분원 동시 오픈 (프랜차이즈 확장 원년)",
+    milestone: true,
+  },
+  {
+    year: "2006",
+    brand: "KINESS",
+    event: "대구·반포 분원 오픈 · 『키 10cm 더 크는 키네스 성장법』 출간",
+  },
+  {
+    year: "2007",
+    brand: "KINESS",
+    event: "창원 분원 오픈",
+  },
+  {
+    year: "2009",
+    brand: "KINESS",
+    event: "수원 분원 오픈",
+  },
+  {
+    year: "2012",
+    brand: "KINESS",
+    event: "마포 분원 오픈",
+  },
+  {
+    year: "2014",
+    brand: "DOVISION",
+    event: "창의융합 뇌교육 연구·시범 운영 착수 (두비전 원형)",
     milestone: true,
   },
   {
     year: "2015",
-    brand: "DOVISION",
-    event: "BTS(Brain Training Skill) 시스템 완성",
+    brand: "KINESS",
+    event: "해외 진출 — 베트남 하노이점 오픈 · 『키 10cm 더 크는 비결』 출간 · 한림대학교 산학협력",
+    milestone: true,
+  },
+  {
+    year: "2017",
+    brand: "KINESS",
+    event: "KBS·MBC 지상파 방송 다수 출연 (아동 성장관리 전문성 검증)",
   },
   {
     year: "2018",
     brand: "DOVISION",
-    event: "두비전 강남 직영 센터 오픈",
+    event: "두비전 강남 직영 1호점 오픈 · 소상공인진흥공단 우수 프랜차이즈 선정",
+    milestone: true,
+  },
+  {
+    year: "2019",
+    brand: "DOVISION",
+    event: "두비전 특허 제10-1994856호 승인 · 『창의융합 뇌교육 두비전』 교재 발행",
+    milestone: true,
   },
   {
     year: "2020",
     brand: "DOVISION",
-    event: "두비전 반포·위례 직영 센터 추가 오픈",
+    event: "두비전 반포·위례 직영 센터 오픈 · 키네스 평택 분원 오픈 · 대원대 MOU",
+  },
+  {
+    year: "2022",
+    brand: "KINESS",
+    event: "용인수지 분원 오픈",
+  },
+  {
+    year: "2023",
+    brand: "KINESS",
+    event: "송도 분원 오픈 (키네스 전국 17개 + 해외 1개 체계 완성)",
   },
   {
     year: "2024",
@@ -134,12 +170,72 @@ const groupInfrastructure = [
   },
 ];
 
-// 미디어 노출 (공개 사실)
+// 미디어 노출 (kiness.co.kr/tv 검증 기반)
 const mediaBadges = [
-  { label: "KBS", desc: "아침 프로그램 방영" },
-  { label: "MBC", desc: "아침 프로그램 방영" },
-  { label: "SBS", desc: "아침 프로그램 방영" },
+  {
+    channel: "KBS",
+    show: "아침뉴스타임",
+    segment: "키 크기 대작전",
+    videoId: "WIiU4A09LCA",
+  },
+  {
+    channel: "MBC",
+    show: "생방송 오늘아침",
+    segment: "1923회 · 우리 아이 10cm 더 키우려면?",
+    videoId: "6p0b1xKOb2g",
+  },
+  {
+    channel: "SBS",
+    show: "좋은아침",
+    segment: "4189회 · 소아비만 다이어트",
+    videoId: "RuFn5-CkWKs",
+  },
+  {
+    channel: "KTV",
+    show: "국민방송",
+    segment: "키네스, 건강하게 자라는 방법",
+    videoId: "RooymiQ1QDM",
+  },
 ];
+
+// 그룹 지적 자산 (특허 + 연구논문 + 출판서적, kiness.co.kr/patent·/thesis·/book 검증)
+const intellectualAssets = {
+  patents: [
+    {
+      name: "두비전",
+      number: "제10-1994856호",
+      desc: "사물 관찰을 통한 시각화 및 학습능력 향상 기술",
+    },
+    { name: "롱맨", number: "제0353638호", desc: "저항조절형 전신협응 운동기구" },
+    {
+      name: "워킹트랙션",
+      number: "제0453547호",
+      desc: "트랙션·유산소 운동 결합 기기",
+    },
+    {
+      name: "맞춤운동 처방 서비스",
+      number: "제0513313호",
+      desc: "검사센터 기반 맞춤 처방",
+    },
+    {
+      name: "바이오시스",
+      number: "제0408698호",
+      desc: "아이소키네틱 근기능 측정기",
+    },
+    {
+      name: "사이버닥터",
+      number: "제0545772호",
+      desc: "맞춤운동 처방기기",
+    },
+  ],
+  books: [
+    { year: "2019.02", title: "창의융합 뇌교육 두비전", brand: "DOVISION" },
+    { year: "2015.06", title: "키 10cm 더 크는 비결", brand: "KINESS" },
+    { year: "2006.12", title: "키 10cm 더 크는 키네스 성장법", brand: "KINESS" },
+    { year: "1998.06", title: "키다리 따라잡기", brand: "KINESS" },
+    { year: "1996.08", title: "약이 되는 운동 병이 되는 운동", brand: "KINESS" },
+  ],
+};
 
 // 그룹 신뢰 포인트
 const trustPoints = [
@@ -499,20 +595,55 @@ export default function GroupPage() {
             </div>
           </SectionFadeIn>
 
-          <div className="mx-auto mt-14 grid max-w-3xl gap-4 sm:grid-cols-3">
+          <div className="mx-auto mt-14 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {mediaBadges.map((m, i) => (
-              <SectionFadeIn key={m.label} delay={i * 0.1}>
-                <div className="rounded-2xl border border-background/20 bg-background/5 p-8 text-center backdrop-blur">
-                  <p className="text-[28px] font-black text-primary sm:text-[34px]">
-                    {m.label}
-                  </p>
-                  <p className="mt-2 text-[12px] text-background/70 sm:text-[13px]">
-                    {m.desc}
-                  </p>
-                </div>
+              <SectionFadeIn key={m.channel} delay={i * 0.08}>
+                <a
+                  href={`https://www.youtube.com/watch?v=${m.videoId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block h-full rounded-2xl border border-background/20 bg-background/5 backdrop-blur transition-all hover:border-primary/60 hover:bg-background/10"
+                >
+                  <div className="relative aspect-video overflow-hidden rounded-t-2xl bg-black">
+                    {/* YouTube 썸네일 */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`https://img.youtube.com/vi/${m.videoId}/hqdefault.jpg`}
+                      alt={`${m.channel} ${m.show} — ${m.segment}`}
+                      className="h-full w-full object-cover opacity-80 transition-opacity group-hover:opacity-100"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/90 text-primary-foreground shadow-lg transition-transform group-hover:scale-110">
+                        <svg
+                          className="h-5 w-5 translate-x-[1px]"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <p className="text-[22px] font-black text-primary sm:text-[26px]">
+                      {m.channel}
+                    </p>
+                    <p className="mt-1 text-[12px] font-semibold text-background/80 sm:text-[13px]">
+                      {m.show}
+                    </p>
+                    <p className="mt-2 text-[11px] leading-[1.5] text-background/60 sm:text-[12px]">
+                      {m.segment}
+                    </p>
+                  </div>
+                </a>
               </SectionFadeIn>
             ))}
           </div>
+
+          <p className="mx-auto mt-6 max-w-3xl text-center text-[11px] text-background/50 sm:text-[12px]">
+            * 썸네일 클릭 시 YouTube 공식 채널 영상으로 이동합니다 (키네스 공개 자료)
+          </p>
 
           <div className="mx-auto mt-10 grid max-w-4xl gap-4 sm:grid-cols-3">
             {trustPoints.map((p, i) => (
@@ -534,8 +665,186 @@ export default function GroupPage() {
         </div>
       </section>
 
-      {/* 그룹 인프라 = 가맹점 혜택 */}
+      {/* 그룹 지적 자산 — 특허·논문·도서 */}
       <section className="py-24">
+        <div className="container-responsive">
+          <SectionFadeIn>
+            <div className="text-center">
+              <p className="text-[13px] font-semibold tracking-[0.2em] text-primary sm:text-[14px]">
+                GROUP IP ASSETS
+              </p>
+              <h2 className="mt-3 font-bold leading-[1.15] tracking-[-0.02em] text-[32px] sm:text-[46px] lg:text-[54px]">
+                특허 <span className="text-primary">6건</span> · 논문{" "}
+                <span className="text-primary">44편+</span> · 도서{" "}
+                <span className="text-primary">5종</span>
+              </h2>
+              <p className="mx-auto mt-5 max-w-2xl text-[15px] font-medium text-muted-foreground sm:text-[17px]">
+                27년간 그룹 본사가 축적해온 지적 자산. 두비전 가맹점주는 이를
+                브랜드 신뢰 자산으로 그대로 활용할 수 있습니다.
+              </p>
+            </div>
+          </SectionFadeIn>
+
+          {/* 특허 리스트 */}
+          <div className="mx-auto mt-14 max-w-6xl">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Lightbulb className="h-5 w-5" />
+              </div>
+              <h3 className="text-[20px] font-bold sm:text-[22px]">
+                대한민국 특허청 등록 특허
+              </h3>
+              <span className="ml-auto rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold text-primary">
+                6건
+              </span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {intellectualAssets.patents.map((p, i) => (
+                <SectionFadeIn key={p.number} delay={i * 0.05}>
+                  <div
+                    className={`h-full rounded-2xl border p-5 ${
+                      p.name === "두비전"
+                        ? "border-primary/40 bg-primary/5"
+                        : "border-border/60 bg-card"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider ${
+                          p.name === "두비전"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-orange-100 text-orange-700"
+                        }`}
+                      >
+                        {p.name}
+                      </span>
+                      <span className="text-[10px] font-semibold text-muted-foreground">
+                        {p.number}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-[13px] font-bold leading-[1.5] sm:text-[14px]">
+                      {p.desc}
+                    </p>
+                  </div>
+                </SectionFadeIn>
+              ))}
+            </div>
+          </div>
+
+          {/* 논문·도서 2단 */}
+          <div className="mx-auto mt-14 grid max-w-6xl gap-5 lg:grid-cols-2">
+            <SectionFadeIn>
+              <div className="h-full rounded-3xl border border-border/60 bg-card p-7 sm:p-9">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-[20px] font-bold sm:text-[22px]">
+                    연구 논문
+                  </h3>
+                  <span className="ml-auto rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold text-primary">
+                    44편+
+                  </span>
+                </div>
+                <p className="mt-5 text-[13px] leading-[1.8] text-muted-foreground sm:text-[14px]">
+                  한국체육학회·한국발육발달학회·한국스포츠학회 등에 지속 게재.
+                  <span className="mt-2 block font-semibold text-foreground/80">
+                    대표 논문
+                  </span>
+                </p>
+                <ul className="mt-3 space-y-2.5 border-t border-border/40 pt-4 text-[12px] leading-[1.65] text-muted-foreground sm:text-[13px]">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 inline-block h-1 w-1 shrink-0 rounded-full bg-primary" />
+                    <span>
+                      <span className="font-bold text-foreground">2020</span> · 뉴로피드백 및 복합운동이 청소년들의{" "}
+                      <span className="font-semibold text-primary">
+                        뇌 기능 지수
+                      </span>
+                      에 미치는 영향 (한국발육발달학회)
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 inline-block h-1 w-1 shrink-0 rounded-full bg-primary" />
+                    <span>
+                      <span className="font-bold text-foreground">2021</span> · 복합 성장운동 프로그램이 청소년들의 키 성장 및 모발조직 미네랄에 미치는 영향 (한국발육발달학회)
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 inline-block h-1 w-1 shrink-0 rounded-full bg-primary" />
+                    <span>
+                      <span className="font-bold text-foreground">2019</span> · 초경 이후 맞춤운동이 최종 키에 미치는 영향 (한국스포츠학회)
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1 inline-block h-1 w-1 shrink-0 rounded-full bg-primary" />
+                    <span>
+                      <span className="font-bold text-foreground">2018</span> · 24주간 규칙적인 복합트레이닝이 저신장 초등학생의 육체적·정신적 스트레스 및 키 성장에 미치는 영향
+                    </span>
+                  </li>
+                </ul>
+                <a
+                  href="https://www.kiness.co.kr/thesis"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-6 inline-flex items-center gap-1.5 text-[12px] font-semibold text-primary hover:underline sm:text-[13px]"
+                >
+                  전체 논문 목록 (kiness.co.kr/thesis)
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </SectionFadeIn>
+
+            <SectionFadeIn delay={0.1}>
+              <div className="h-full rounded-3xl border border-border/60 bg-card p-7 sm:p-9">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <BookOpen className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-[20px] font-bold sm:text-[22px]">
+                    출판 서적
+                  </h3>
+                  <span className="ml-auto rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold text-primary">
+                    5종
+                  </span>
+                </div>
+                <p className="mt-5 text-[13px] leading-[1.8] text-muted-foreground sm:text-[14px]">
+                  1996년부터 이어진 전문서 집필. 각 도서는 현장 커리큘럼과
+                  연동됩니다.
+                </p>
+                <ul className="mt-4 space-y-3 border-t border-border/40 pt-4">
+                  {intellectualAssets.books.map((b) => (
+                    <li
+                      key={b.title}
+                      className="flex items-start gap-3 text-[13px] leading-[1.6] sm:text-[14px]"
+                    >
+                      <span
+                        className={`mt-0.5 shrink-0 rounded px-2 py-0.5 text-[9px] font-bold tracking-wider ${
+                          b.brand === "DOVISION"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-orange-100 text-orange-700"
+                        }`}
+                      >
+                        {b.brand}
+                      </span>
+                      <div className="flex-1">
+                        <p className="font-bold text-foreground/90">
+                          『{b.title}』
+                        </p>
+                        <p className="text-[11px] text-muted-foreground sm:text-[12px]">
+                          {b.year} 발행
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </SectionFadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* 그룹 인프라 = 가맹점 혜택 */}
+      <section className="bg-[oklch(0.97_0.005_290)] py-24">
         <div className="container-responsive">
           <SectionFadeIn>
             <div className="mx-auto max-w-3xl text-center">
@@ -576,7 +885,7 @@ export default function GroupPage() {
       </section>
 
       {/* 교차 시너지 */}
-      <section className="bg-[oklch(0.97_0.005_290)] py-24">
+      <section className="py-24">
         <div className="container-responsive">
           <div className="mx-auto max-w-5xl">
             <SectionFadeIn>

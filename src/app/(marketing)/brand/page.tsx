@@ -48,10 +48,11 @@ const values = [
 
 const history = [
   { year: "2001", event: "두비전 뇌교육 프로그램 연구·개발 시작" },
-  { year: "2005", event: "이미지전환기억법 특허 등록" },
   { year: "2010", event: "뉴로피드백 트레이닝 프로그램 도입" },
+  { year: "2014", event: "창의융합 뇌교육 센터 시범 운영 착수" },
   { year: "2015", event: "BTS(Brain Training Skill) 시스템 완성, 통신판매업 신고 (2015-서울강남-03819)" },
-  { year: "2018", event: "강남 직영 센터 오픈" },
+  { year: "2018", event: "강남 직영 1호점 오픈 · 소상공인진흥공단 우수 프랜차이즈 선정" },
+  { year: "2019", event: "이미지전환기억법 특허 제10-1994856호 승인 · 『창의융합 뇌교육 두비전』 교재 발행" },
   { year: "2020", event: "반포·위례 직영 센터 추가 오픈" },
   { year: "2024", event: "가맹 사업 본격 확장 및 전국 모집 개시" },
 ];
@@ -382,6 +383,28 @@ export default function BrandPage() {
                 없어, 가맹점주는 지역 독점권과 함께 안정적인 영업권을 확보할 수
                 있습니다.
               </p>
+
+              {/* 특허 상세 카드 */}
+              <div className="mt-8 rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-6">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-md bg-primary px-2 py-0.5 text-[10px] font-bold tracking-wider text-primary-foreground">
+                    DOVISION
+                  </span>
+                  <span className="text-[11px] font-bold tracking-wider text-primary">
+                    KOREA PATENT
+                  </span>
+                </div>
+                <p className="mt-3 text-[14px] font-extrabold tracking-tight sm:text-[16px]">
+                  특허 제10-1994856호
+                </p>
+                <p className="mt-1 text-[13px] font-semibold text-foreground/85 sm:text-[14px]">
+                  사물 관찰을 통한 시각화 및 학습능력 향상 기술
+                </p>
+                <p className="mt-3 text-[12px] leading-[1.65] text-muted-foreground sm:text-[13px]">
+                  2019년 특허청 승인 · 그룹 본사(㈜키네스) 명의 보유 · 두비전
+                  가맹점에 지역 독점 라이선스 부여
+                </p>
+              </div>
             </SectionFadeIn>
           </div>
         </div>
