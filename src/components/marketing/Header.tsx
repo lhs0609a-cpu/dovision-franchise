@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const navItems = [
   { href: "/brand", label: "브랜드 소개" },
+  { href: "/group", label: "그룹" },
   { href: "/program", label: "프로그램" },
   { href: "/success", label: "성과 사례" },
   { href: "/franchise", label: "가맹 안내" },

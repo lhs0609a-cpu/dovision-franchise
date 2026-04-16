@@ -31,6 +31,7 @@ export default function Hero() {
 
       <div className="container-responsive relative z-10 flex flex-col items-center justify-center text-center">
         <motion.div
+          className="flex flex-wrap items-center justify-center gap-2"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
@@ -38,6 +39,13 @@ export default function Hero() {
           <span className="inline-block rounded-full bg-primary/10 px-5 py-2 text-[13px] font-semibold tracking-wide text-primary sm:text-sm">
             창의융합 뇌교육 플랫폼
           </span>
+          <Link
+            href="/group"
+            className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-white/70 px-4 py-2 text-[12px] font-semibold tracking-wide text-foreground/80 backdrop-blur transition-colors hover:border-primary/50 hover:text-primary sm:text-[13px]"
+          >
+            ㈜키네스 그룹 · 프랜차이즈 27년
+            <ArrowRight className="h-3 w-3" />
+          </Link>
         </motion.div>
 
         <motion.h1
@@ -93,7 +101,11 @@ export default function Hero() {
         >
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-primary" />
-            직영 3개 센터 운영 중
+            ㈜키네스 그룹 · 27년
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-primary" />
+            직영 3개 센터
           </div>
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-primary" />

@@ -18,6 +18,9 @@ import {
   Phone,
   ShieldCheck,
   Calculator,
+  Dna,
+  Network,
+  Megaphone,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -31,7 +34,7 @@ const supports = {
     "상권 분석 및 입지 선정 컨설팅",
     "인테리어 설계 및 시공 관리",
     "뉴로피드백 장비 세팅 및 검수",
-    "2주 집중 교육 연수 (가맹점주 + 강사)",
+    "실장 1명 · 교사 2명 3개월 집중 연수 (교육비 1,500만원 포함)",
     "교재·학습 콘텐츠 및 앱 제공",
     "오픈 마케팅 패키지 지원",
   ],
@@ -193,6 +196,136 @@ export default function FranchisePage() {
                 </div>
               </SectionFadeIn>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 키네스 그룹 DNA·시너지 */}
+      <section className="relative overflow-hidden bg-foreground py-20 text-background">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,oklch(0.45_0.18_290_/_0.35),transparent_60%)]" />
+        <div className="container-responsive relative z-10">
+          <SectionFadeIn>
+            <div className="text-center">
+              <p className="text-[13px] font-semibold tracking-[0.2em] text-primary sm:text-[14px]">
+                KINESS GROUP SYNERGY
+              </p>
+              <h2 className="mt-3 font-medium leading-[1.15] tracking-[-0.02em] text-[32px] sm:text-[44px] lg:text-[56px]">
+                두비전은 <span className="font-black text-primary">27년 프랜차이즈</span>의
+                <br />
+                DNA를 그대로 이식받습니다.
+              </h2>
+              <p className="mx-auto mt-6 max-w-2xl text-[15px] leading-[1.7] text-background/70 sm:text-[17px]">
+                신생 브랜드 가맹이 아닙니다. 1999년 설립된 ㈜키네스 그룹이 전국 17개
+                지점·해외 1개국을 운영하며 축적한 실전 매뉴얼이, 두비전 가맹점주의
+                첫 날부터 그대로 작동합니다.
+              </p>
+            </div>
+          </SectionFadeIn>
+
+          <div className="mx-auto mt-14 grid max-w-5xl gap-5 lg:grid-cols-3">
+            <SectionFadeIn delay={0.05}>
+              <div className="h-full rounded-2xl border border-background/15 bg-background/5 p-7 backdrop-blur transition-colors hover:border-primary/40">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                  <Dna className="h-6 w-6" />
+                </div>
+                <h3 className="mt-5 text-[18px] font-bold sm:text-[19px]">
+                  검증된 운영 매뉴얼
+                </h3>
+                <p className="mt-3 text-[14px] leading-[1.7] text-background/70 sm:text-[15px]">
+                  키네스 17개 지점이 27년 동안 다듬어 온 상담·회원 관리·환불·
+                  클레임 대응 매뉴얼이 그대로 두비전에 이식됩니다. 가맹점주는
+                  &ldquo;처음부터 몰라서 생기는 실수&rdquo;를 피합니다.
+                </p>
+              </div>
+            </SectionFadeIn>
+
+            <SectionFadeIn delay={0.15}>
+              <div className="h-full rounded-2xl border border-background/15 bg-background/5 p-7 backdrop-blur transition-colors hover:border-primary/40">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                  <Users className="h-6 w-6" />
+                </div>
+                <h3 className="mt-5 text-[18px] font-bold sm:text-[19px]">
+                  동일 타겟 고객 풀
+                </h3>
+                <p className="mt-3 text-[14px] leading-[1.7] text-background/70 sm:text-[15px]">
+                  키네스(성장관리)와 두비전(뇌교육)은 &ldquo;8세 이상 자녀의 잠재력을
+                  과학으로 끌어올리려는 학부모&rdquo;라는 동일 고객을 공유합니다.
+                  같은 상권에서 크로스-레퍼럴이 발생합니다.
+                </p>
+              </div>
+            </SectionFadeIn>
+
+            <SectionFadeIn delay={0.25}>
+              <div className="h-full rounded-2xl border border-background/15 bg-background/5 p-7 backdrop-blur transition-colors hover:border-primary/40">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                  <Network className="h-6 w-6" />
+                </div>
+                <h3 className="mt-5 text-[18px] font-bold sm:text-[19px]">
+                  본사 슈퍼바이저 조직
+                </h3>
+                <p className="mt-3 text-[14px] leading-[1.7] text-background/70 sm:text-[15px]">
+                  ㈜키네스 본사에 이미 구축된 슈퍼바이저·교육·R&amp;D 조직을 그대로
+                  활용합니다. 별도의 본사 조직 셋업 비용 없이, 가맹 첫 달부터
+                  풀 지원이 가동됩니다.
+                </p>
+              </div>
+            </SectionFadeIn>
+
+            <SectionFadeIn delay={0.3}>
+              <div className="h-full rounded-2xl border border-background/15 bg-background/5 p-7 backdrop-blur transition-colors hover:border-primary/40">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                  <Megaphone className="h-6 w-6" />
+                </div>
+                <h3 className="mt-5 text-[18px] font-bold sm:text-[19px]">
+                  공동 마케팅 자산
+                </h3>
+                <p className="mt-3 text-[14px] leading-[1.7] text-background/70 sm:text-[15px]">
+                  KBS·MBC·SBS 등 지상파 다수 출연 이력과 연구 논문·도서 실적이
+                  두비전 브랜드 신뢰도로 이어집니다. 신규 오픈 시점에 학부모
+                  신뢰를 빠르게 확보할 수 있습니다.
+                </p>
+              </div>
+            </SectionFadeIn>
+
+            <SectionFadeIn delay={0.35}>
+              <div className="h-full rounded-2xl border border-background/15 bg-background/5 p-7 backdrop-blur transition-colors hover:border-primary/40">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                  <MapPin className="h-6 w-6" />
+                </div>
+                <h3 className="mt-5 text-[18px] font-bold sm:text-[19px]">
+                  상권 데이터 · 입지 우선권
+                </h3>
+                <p className="mt-3 text-[14px] leading-[1.7] text-background/70 sm:text-[15px]">
+                  서울·경인·경상권 주요 상권에서 키네스가 쌓아 온 상권 데이터를
+                  바탕으로 두비전 입지를 컨설팅합니다. 키네스 기존 지점 인근은
+                  시너지 확보가 가능한 우선 검토 지역입니다.
+                </p>
+              </div>
+            </SectionFadeIn>
+
+            <SectionFadeIn delay={0.4}>
+              <div className="flex h-full flex-col justify-between rounded-2xl border border-primary/40 bg-primary/15 p-7 backdrop-blur">
+                <div>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                    <ArrowRight className="h-6 w-6" />
+                  </div>
+                  <h3 className="mt-5 text-[18px] font-bold sm:text-[19px]">
+                    그룹 전체 이야기
+                  </h3>
+                  <p className="mt-3 text-[14px] leading-[1.7] text-background/80 sm:text-[15px]">
+                    키네스 그룹의 27년 타임라인·미디어 노출·전국 네트워크를 한눈에
+                    확인하세요.
+                  </p>
+                </div>
+                <Link
+                  href="/group"
+                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[13px] font-bold text-primary-foreground transition-colors hover:bg-[oklch(0.38_0.18_290)] sm:text-[14px]"
+                >
+                  그룹 페이지 바로가기
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </SectionFadeIn>
           </div>
         </div>
       </section>
@@ -369,6 +502,10 @@ export default function FranchisePage() {
           </SectionFadeIn>
           <div className="mx-auto mt-12 max-w-3xl space-y-4">
             {[
+              {
+                q: "㈜키네스 그룹이 두비전을 운영한다는 건 어떤 의미인가요?",
+                a: "㈜키네스는 1999년부터 27년간 아동·청소년 교육 분야에서 전국 17개 지점과 해외 1개국(베트남 하노이)을 운영해 온 프랜차이즈 기업입니다. 성장관리 브랜드 '키네스'와 뇌교육 브랜드 '두비전'을 동일 본사가 운영하므로, 가맹점주는 키네스 그룹이 검증한 운영 매뉴얼·슈퍼바이저 조직·R&D 역량을 첫 날부터 그대로 사용할 수 있습니다. 자세한 내용은 /group 페이지에서 확인하세요.",
+              },
               {
                 q: "교육업 경험이 없어도 운영이 가능한가요?",
                 a: "네. 본사가 실장·교사 3개월 집중 교육 연수를 통해 프로그램 이해부터 상담·회원 관리까지 전 과정을 교육합니다(교육비 1,500만원 포함). 오픈 후에도 슈퍼바이저가 정기 방문해 운영 전반을 지원합니다.",

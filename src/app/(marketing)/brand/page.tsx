@@ -13,6 +13,8 @@ import {
   Mail,
   Building2,
   ArrowRight,
+  Tv,
+  Globe2,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -167,6 +169,118 @@ export default function BrandPage() {
                   <p className="text-[11px] font-semibold text-muted-foreground">통신판매업</p>
                   <p className="mt-1 font-bold">2015-서울강남-03819</p>
                 </div>
+              </div>
+            </SectionFadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* 키네스 그룹 — 모기업 네트워크 */}
+      <section className="relative overflow-hidden bg-foreground py-20 text-background">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,oklch(0.45_0.18_290_/_0.35),transparent_60%)]" />
+        <div className="container-responsive relative z-10">
+          <div className="grid items-start gap-12 lg:grid-cols-[3fr_4fr] lg:gap-16">
+            <SectionFadeIn>
+              <p className="text-[13px] font-semibold tracking-[0.2em] text-primary sm:text-[14px]">
+                GROUP NETWORK
+              </p>
+              <h2 className="mt-3 font-medium leading-[1.1] tracking-[-0.02em] text-[34px] sm:text-[46px] lg:text-[56px]">
+                <span className="font-black text-primary">27년</span> 프랜차이즈
+                <br />
+                <span className="font-black">노하우 위에서</span>
+                <br />
+                두비전은 출발합니다.
+              </h2>
+              <p className="mt-6 text-[15px] leading-[1.8] text-background/70 sm:text-[16px]">
+                ㈜키네스는 1999년 설립 이래 아동·청소년 교육 분야에서 전국 17개
+                지점과 해외 1개국(베트남 하노이)으로 확장한 프랜차이즈 그룹입니다.
+                성장관리 브랜드 <span className="font-bold text-background">키네스</span>와
+                뇌교육 브랜드 <span className="font-bold text-primary">두비전</span>을
+                함께 운영하며, 두 브랜드의 R&amp;D·운영·교육 노하우가 그대로
+                두비전 가맹점주에게 이식됩니다.
+              </p>
+
+              <div className="mt-10">
+                <Link
+                  href="/group"
+                  className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-[14px] font-bold text-primary-foreground transition-colors hover:bg-[oklch(0.38_0.18_290)] sm:text-[15px]"
+                >
+                  ㈜키네스 그룹 스토리 보기
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </SectionFadeIn>
+
+            <SectionFadeIn delay={0.1}>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-2xl border border-background/15 bg-background/5 p-6 backdrop-blur">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Building2 className="h-4 w-4" />
+                    <span className="text-[11px] font-bold tracking-[0.15em]">
+                      FOUNDED
+                    </span>
+                  </div>
+                  <p className="mt-3 text-[32px] font-extrabold sm:text-[40px]">
+                    1999
+                  </p>
+                  <p className="mt-1 text-[13px] text-background/60">
+                    ㈜키네스 설립
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-background/15 bg-background/5 p-6 backdrop-blur">
+                  <div className="flex items-center gap-2 text-primary">
+                    <MapPin className="h-4 w-4" />
+                    <span className="text-[11px] font-bold tracking-[0.15em]">
+                      BRANCHES
+                    </span>
+                  </div>
+                  <p className="mt-3 text-[32px] font-extrabold sm:text-[40px]">
+                    20<span className="text-primary">+</span>
+                  </p>
+                  <p className="mt-1 text-[13px] text-background/60">
+                    그룹 전체 지점 (키네스 17 + 두비전 3)
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-background/15 bg-background/5 p-6 backdrop-blur">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Globe2 className="h-4 w-4" />
+                    <span className="text-[11px] font-bold tracking-[0.15em]">
+                      GLOBAL
+                    </span>
+                  </div>
+                  <p className="mt-3 text-[32px] font-extrabold sm:text-[40px]">
+                    1
+                    <span className="ml-1 text-[18px] text-background/60 sm:text-[22px]">
+                      개국
+                    </span>
+                  </p>
+                  <p className="mt-1 text-[13px] text-background/60">
+                    해외 진출 · 베트남 하노이
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-background/15 bg-background/5 p-6 backdrop-blur">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Tv className="h-4 w-4" />
+                    <span className="text-[11px] font-bold tracking-[0.15em]">
+                      ON AIR
+                    </span>
+                  </div>
+                  <p className="mt-3 text-[18px] font-extrabold leading-tight sm:text-[22px]">
+                    KBS · MBC · SBS
+                  </p>
+                  <p className="mt-1 text-[13px] text-background/60">
+                    지상파 방송 다수 출연
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-primary/30 bg-primary/10 p-5 backdrop-blur">
+                <p className="text-[13px] leading-[1.7] text-background/80 sm:text-[14px]">
+                  <span className="font-bold text-primary">두 브랜드, 하나의 그룹.</span>{" "}
+                  키네스(성장관리)와 두비전(뇌교육)은 &ldquo;아이의 잠재력을
+                  과학으로 끌어올린다&rdquo;는 동일한 철학 아래 운영되며, 본사
+                  슈퍼바이저·운영 매뉴얼·연수 시스템을 공유합니다.
+                </p>
               </div>
             </SectionFadeIn>
           </div>
