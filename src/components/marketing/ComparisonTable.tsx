@@ -8,7 +8,7 @@ const comparisons = [
   { feature: "뉴로피드백 장비 훈련", dovision: true, general: false },
   { feature: "과학적 성과 측정", dovision: true, general: false },
   { feature: "본사 교육 연수 지원", dovision: true, general: false },
-  { feature: "높은 객단가 (월 30~50만원)", dovision: true, general: false },
+  { feature: "높은 객단가 (월 80만원 · 6개월 선불 480만원)", dovision: true, general: false },
   { feature: "차별화된 커리큘럼", dovision: true, general: false },
   { feature: "낮은 경쟁률 (블루오션)", dovision: true, general: false },
   { feature: "슈퍼바이저 정기 방문", dovision: true, general: false },

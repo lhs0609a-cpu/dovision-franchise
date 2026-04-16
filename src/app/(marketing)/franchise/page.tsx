@@ -82,7 +82,7 @@ const keyPoints = [
   {
     icon: Calculator,
     title: "검증된 수익 모델",
-    desc: "6개월 선불 등록 기반, 회원 9명 이상 확보 시 월 순이익 300~500만원 구간 진입.",
+    desc: "6개월 선불 480만원 등록 기반. 월 신규등록 5명 시 월 순이익 600만원, 7명 시 1,560만원 구간.",
   },
 ];
 
@@ -212,11 +212,11 @@ export default function FranchisePage() {
                 ROYALTY
               </p>
               <h2 className="mt-3 font-bold leading-[1.15] tracking-[-0.02em] text-[32px] sm:text-[44px] lg:text-[52px]">
-                투명한 로열티 구조
+                로열티 구조
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-[15px] font-medium text-muted-foreground sm:text-[17px]">
-                매출 비례가 아닌 정액제로, 가맹점의 성장을 본사가 함께
-                응원합니다.
+                매출 연동형 로열티로, 오픈 초기에는 부담을 낮추고 매출 성장과
+                함께 본사도 책임을 나눕니다.
               </p>
             </div>
           </SectionFadeIn>
@@ -224,29 +224,30 @@ export default function FranchisePage() {
             <div className="grid gap-8 sm:grid-cols-2">
               <div className="text-center">
                 <p className="text-[12px] font-semibold text-muted-foreground">
-                  월 정액 로열티
+                  매출 연동 로열티
                 </p>
                 <p className="mt-2 text-[40px] font-extrabold text-primary sm:text-[48px]">
-                  50<span className="text-[20px]">만원</span>
+                  10<span className="text-[20px]">%</span>
                 </p>
                 <p className="mt-2 text-[12px] text-muted-foreground sm:text-[13px]">
-                  매출과 무관한 고정 금액
+                  월 매출액 × 10%
                 </p>
               </div>
               <div className="text-center sm:border-l sm:border-border/60 sm:pl-8">
                 <p className="text-[12px] font-semibold text-muted-foreground">
-                  광고 분담금
+                  기본 로열티 (최소)
                 </p>
                 <p className="mt-2 text-[40px] font-extrabold text-primary sm:text-[48px]">
-                  10<span className="text-[20px]">만원/월</span>
+                  250<span className="text-[20px]">만원/월</span>
                 </p>
                 <p className="mt-2 text-[12px] text-muted-foreground sm:text-[13px]">
-                  본사 공동 마케팅 집행
+                  매출 저조 시 하한선
                 </p>
               </div>
             </div>
-            <p className="mt-8 border-t border-border/60 pt-6 text-center text-[12px] text-muted-foreground sm:text-[13px]">
-              * 교재·장비 공급가는 별도. 신규 프로그램 업데이트는 로열티에 포함.
+            <p className="mt-8 border-t border-border/60 pt-6 text-center text-[12px] leading-[1.7] text-muted-foreground sm:text-[13px]">
+              * 기본계획서 기준 · 신규 프로그램·교재 업데이트, 슈퍼바이저 방문
+              컨설팅은 로열티에 포함됩니다.
             </p>
           </div>
         </div>
@@ -370,15 +371,19 @@ export default function FranchisePage() {
             {[
               {
                 q: "교육업 경험이 없어도 운영이 가능한가요?",
-                a: "네. 본사가 2주 집중 교육 연수를 통해 프로그램 이해부터 상담·회원 관리까지 전 과정을 교육합니다. 오픈 후에도 슈퍼바이저가 정기 방문해 운영 전반을 지원합니다.",
+                a: "네. 본사가 실장·교사 3개월 집중 교육 연수를 통해 프로그램 이해부터 상담·회원 관리까지 전 과정을 교육합니다(교육비 1,500만원 포함). 오픈 후에도 슈퍼바이저가 정기 방문해 운영 전반을 지원합니다.",
               },
               {
                 q: "초기 투자비는 어느 수준인가요?",
-                a: "30~35평 기준 총 1억원 규모입니다. 가입비 1,000만원, 인테리어 2,500~3,000만원, 집기·간판 3,000~3,500만원, 강의실 구성·교육 컨설팅 3,000만원. 임대보증금은 별도입니다.",
+                a: "30~35평 기준 총 1억원입니다. 가입비 1,000만원 · 인테리어 2,500~3,000만원 · 강의시설/장비 1,500만원 · 교육비(3개월) 1,500만원. 임대보증금 2,500~3,000만원은 별도이며, 월 운영비는 1,300~1,800만원입니다.",
               },
               {
                 q: "손익분기점은 언제쯤 도달하나요?",
-                a: "지역과 운영에 따라 다르지만, 평균 3~6개월 내 BEP 도달이 일반적입니다. 회원 9명 이상부터는 월 순이익 300~500만원 구간에 진입합니다.",
+                a: "월 신규등록 3~4명이 BEP 지점입니다(월 지출 1,800만원 기준). 5명 확보 시 월 순이익 600만원, 7명 시 1,560만원, 10명 시 3,000만원 구간입니다.",
+              },
+              {
+                q: "등록 방식은 어떻게 되나요?",
+                a: "주 2회 수업(중 교육 + 코칭/상담 + 필요시 뉴로피드백) 기준 월 80만원이며, 6개월 선불 480만원으로 등록합니다. 뇌기능 검사 및 상담은 매 3개월 재검사 시 10만원이 별도 부과됩니다.",
               },
               {
                 q: "지역 독점권이 보장되나요?",

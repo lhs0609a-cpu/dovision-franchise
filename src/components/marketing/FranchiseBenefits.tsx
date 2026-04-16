@@ -13,13 +13,13 @@ import {
 const benefits = [
   {
     icon: Wallet,
-    title: "소자본 창업",
-    desc: "3,800만원부터 시작 가능. 일반 학원 대비 낮은 초기 투자비",
+    title: "표준화된 투자 구조",
+    desc: "30~35평 기준 1억원 · 가입비 1,000 + 인테리어 2,500~3,000 + 장비 1,500 + 교육비 1,500",
   },
   {
     icon: TrendingUp,
-    title: "높은 수익률",
-    desc: "월 평균 객단가 30~50만원. BEP 3~6개월 달성",
+    title: "검증된 수익 모델",
+    desc: "월 신규 5명 시 순이익 600만원, 7명 시 1,560만원 · BEP는 월 신규 3~4명",
   },
   {
     icon: ShieldCheck,
@@ -29,7 +29,7 @@ const benefits = [
   {
     icon: GraduationCap,
     title: "체계적 교육",
-    desc: "2주 집중 연수 + 지속적인 역량 강화 교육",
+    desc: "실장·교사 3개월 집중 연수 + 지속적인 역량 강화 교육",
   },
   {
     icon: Headphones,
