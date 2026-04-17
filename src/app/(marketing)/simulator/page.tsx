@@ -72,8 +72,8 @@ const tips = [
   },
   {
     icon: TrendingUp,
-    title: "월 고정 지출 (1,300~1,800만원)",
-    desc: "임대 250 + 인건비 850 + 로얄티 250 + 세금/홍보 250~350 + 기타 100. 오픈 초기에는 1,300만원 수준에서 시작합니다.",
+    title: "월 지출 (1,300~1,800만원, 본사 공급원가 포함)",
+    desc: "임대 250 + 인건비 850 + 세금/홍보 250~350 + 기타 100 + 본사 공급원가(로얄티 10% + 앱교재비 12.5% = 매출의 22.5%). 오픈 초기에는 1,300만원 수준에서 시작합니다.",
   },
 ];
 
@@ -81,7 +81,8 @@ const assumptions = [
   "초기 투자비 1억원 기준 (가입비·인테리어·장비·교육비 포함, 임대보증금 2,500~3,000만원 별도)",
   "등록비는 6개월 선불 480만원 단일 상품 (월 80만원 × 6개월)",
   "월 매출 = 월 신규등록 회원 수 × 480만원 (현금 유입 기준)",
-  "월 고정 지출은 기본계획서 정상 운영(인건비 850만원 포함) 기준 1,800만원",
+  "월 지출 1,800만원에는 본사 공급원가(로얄티 10% + 앱교재비 12.5% = 매출 × 22.5%)가 포함되어 있습니다",
+  "본사 공급원가는 음식점의 재료비에 해당하며, 매출의 77.5%가 가맹점주 가용 매출로 남습니다",
   "BEP(손익분기점)는 월 신규등록 3~4명 구간",
   "초기투자 회수 시점은 누적 순이익이 1억원을 초과하는 시점",
   "본 시뮬레이션은 참고용이며, 지역·입지·마케팅 역량에 따라 달라질 수 있습니다",
@@ -133,6 +134,8 @@ export default function SimulatorPage() {
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-[15px] font-medium text-muted-foreground sm:text-[17px]">
                 6개월 선불 등록비 480만원 · 월 지출 1,800만원 기준
+                <br className="hidden sm:inline" />
+                (본사 공급원가 22.5% 포함)
               </p>
             </div>
           </SectionFadeIn>
@@ -183,9 +186,12 @@ export default function SimulatorPage() {
           </SectionFadeIn>
 
           <SectionFadeIn delay={0.2}>
-            <p className="mt-6 text-center text-[13px] text-muted-foreground sm:text-[14px]">
+            <p className="mt-6 text-center text-[13px] leading-[1.7] text-muted-foreground sm:text-[14px]">
               ※ BEP(손익분기점): 월 신규등록 3~4명 · 위 표는 정상 운영(월지출
               1,800만원) 기준
+              <br />
+              월지출 1,800만원에는 본사 공급원가(로얄티 10% + 앱교재비 12.5% =
+              매출 × 22.5%)가 포함되어 있습니다.
             </p>
           </SectionFadeIn>
         </div>

@@ -96,7 +96,8 @@ export default function ROICalculator() {
                 <span>2,000만원</span>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                임대·인건비(850) + 로얄티(250) + 세금/홍보 + 기타
+                임대·인건비(850) + 본사 공급원가 22.5%(로얄티 10% + 앱교재비
+                12.5%) + 세금/홍보 + 기타
               </p>
             </div>
           </div>

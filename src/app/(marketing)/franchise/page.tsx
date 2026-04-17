@@ -359,51 +359,106 @@ export default function FranchisePage() {
       {/* 투자비 상세 (기존 컴포넌트) */}
       <InvestmentTable />
 
-      {/* 로열티 구조 */}
+      {/* 본사 공급원가 (로열티 + 앱 교재비) */}
       <section className="py-20">
         <div className="container-responsive">
           <SectionFadeIn>
             <div className="text-center">
               <p className="text-[13px] font-semibold tracking-[0.2em] text-primary sm:text-[14px]">
-                ROYALTY
+                COGS · ROYALTY
               </p>
               <h2 className="mt-3 font-bold leading-[1.15] tracking-[-0.02em] text-[32px] sm:text-[44px] lg:text-[52px]">
-                로열티 구조
+                본사 공급원가 <span className="text-primary">22.5%</span>
               </h2>
-              <p className="mx-auto mt-5 max-w-xl text-[15px] font-medium text-muted-foreground sm:text-[17px]">
-                매출 연동형 로열티로, 오픈 초기에는 부담을 낮추고 매출 성장과
-                함께 본사도 책임을 나눕니다.
+              <p className="mx-auto mt-5 max-w-2xl text-[15px] font-medium leading-[1.7] text-muted-foreground sm:text-[17px]">
+                음식점의 &ldquo;재료비&rdquo;에 해당하는 본사 공급원가는
+                <strong className="text-foreground"> 매출액의 22.5%</strong>
+                입니다. 동종 교육 프랜차이즈 대비 가맹점주 마진을 최대로 보장하는
+                구조입니다.
               </p>
             </div>
           </SectionFadeIn>
-          <div className="mx-auto mt-12 max-w-3xl rounded-2xl border border-border/60 bg-card p-8 sm:p-10">
-            <div className="grid gap-8 sm:grid-cols-2">
-              <div className="text-center">
-                <p className="text-[12px] font-semibold text-muted-foreground">
-                  매출 연동 로열티
-                </p>
-                <p className="mt-2 text-[40px] font-extrabold text-primary sm:text-[48px]">
-                  10<span className="text-[20px]">%</span>
-                </p>
-                <p className="mt-2 text-[12px] text-muted-foreground sm:text-[13px]">
-                  월 매출액 × 10%
-                </p>
-              </div>
-              <div className="text-center sm:border-l sm:border-border/60 sm:pl-8">
-                <p className="text-[12px] font-semibold text-muted-foreground">
-                  기본 로열티 (최소)
-                </p>
-                <p className="mt-2 text-[40px] font-extrabold text-primary sm:text-[48px]">
-                  250<span className="text-[20px]">만원/월</span>
-                </p>
-                <p className="mt-2 text-[12px] text-muted-foreground sm:text-[13px]">
-                  매출 저조 시 하한선
-                </p>
-              </div>
+
+          <div className="mx-auto mt-12 max-w-4xl">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <SectionFadeIn delay={0.05}>
+                <div className="h-full rounded-2xl border border-border/60 bg-card p-7 sm:p-8">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
+                      ROYALTY
+                    </span>
+                    <p className="text-[13px] font-semibold text-muted-foreground">
+                      매출 연동 로열티
+                    </p>
+                  </div>
+                  <p className="mt-5 text-[44px] font-extrabold text-primary sm:text-[56px]">
+                    10<span className="text-[22px]">%</span>
+                  </p>
+                  <p className="mt-2 text-[13px] text-muted-foreground sm:text-[14px]">
+                    월 매출액 × 10% · 신규 프로그램·교재 업데이트, 슈퍼바이저
+                    방문 컨설팅 포함
+                  </p>
+                  <p className="mt-4 rounded-lg bg-muted/40 p-3 text-[12px] text-muted-foreground sm:text-[13px]">
+                    기본 하한선: 월 250만원 (매출 저조 시)
+                  </p>
+                </div>
+              </SectionFadeIn>
+
+              <SectionFadeIn delay={0.15}>
+                <div className="h-full rounded-2xl border border-border/60 bg-card p-7 sm:p-8">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
+                      APP · TEXTBOOK
+                    </span>
+                    <p className="text-[13px] font-semibold text-muted-foreground">
+                      앱 교재비 (본사 공급)
+                    </p>
+                  </div>
+                  <p className="mt-5 text-[44px] font-extrabold text-primary sm:text-[56px]">
+                    12.5<span className="text-[22px]">%</span>
+                  </p>
+                  <p className="mt-2 text-[13px] text-muted-foreground sm:text-[14px]">
+                    회원 1인 6개월 60만원 · 매출 480만원 대비 12.5%. 학습 앱
+                    라이선스·디지털 교재가 포함됩니다.
+                  </p>
+                  <p className="mt-4 rounded-lg bg-muted/40 p-3 text-[12px] text-muted-foreground sm:text-[13px]">
+                    종전 단가(120만원) 대비 50% 인하 · 가맹점주 마진 강화
+                  </p>
+                </div>
+              </SectionFadeIn>
             </div>
-            <p className="mt-8 border-t border-border/60 pt-6 text-center text-[12px] leading-[1.7] text-muted-foreground sm:text-[13px]">
-              * 기본계획서 기준 · 신규 프로그램·교재 업데이트, 슈퍼바이저 방문
-              컨설팅은 로열티에 포함됩니다.
+
+            <SectionFadeIn delay={0.25}>
+              <div className="mt-6 rounded-2xl border border-primary/40 bg-primary/5 p-7 sm:p-8">
+                <div className="grid items-center gap-6 sm:grid-cols-[1fr_auto]">
+                  <div>
+                    <p className="text-[12px] font-semibold tracking-[0.15em] text-primary">
+                      TOTAL COGS
+                    </p>
+                    <p className="mt-2 text-[20px] font-bold sm:text-[24px]">
+                      가맹점주 입장의 &ldquo;재료비&rdquo; 합계
+                    </p>
+                    <p className="mt-2 text-[13px] leading-[1.7] text-muted-foreground sm:text-[14px]">
+                      매출의 77.5%가 가맹점주에게 남습니다. 5명/월 신규등록 기준
+                      매출 2,400만원 → 본사 공급원가 540만원 · 가맹점 가용 매출
+                      1,860만원.
+                    </p>
+                  </div>
+                  <div className="text-center sm:text-right">
+                    <p className="text-[60px] font-black leading-none text-primary sm:text-[80px]">
+                      22.5<span className="text-[28px]">%</span>
+                    </p>
+                    <p className="mt-1 text-[12px] font-semibold text-muted-foreground sm:text-[13px]">
+                      매출액 대비 본사 공급원가
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </SectionFadeIn>
+
+            <p className="mt-6 text-center text-[12px] leading-[1.7] text-muted-foreground sm:text-[13px]">
+              * 기본계획서 기준 · 임대료·인건비·세금·홍보·소모품 등 고정 운영비는
+              별도입니다.
             </p>
           </div>
         </div>
@@ -535,11 +590,15 @@ export default function FranchisePage() {
               },
               {
                 q: "초기 투자비는 어느 수준인가요?",
-                a: "30~35평 기준 총 1억원입니다. 가입비 1,000만원 · 인테리어 2,500~3,000만원 · 강의시설/장비 1,500만원 · 교육비(3개월) 1,500만원. 임대보증금 2,500~3,000만원은 별도이며, 월 운영비는 1,300~1,800만원입니다.",
+                a: "30~35평 기준 총 1억원입니다. 가입비 1,000만원 · 인테리어 2,500~3,000만원 · 강의시설/장비 1,500만원 · 교육비(3개월) 1,500만원. 임대보증금 2,500~3,000만원은 별도이며, 월 운영비는 1,300~1,800만원(본사 공급원가 22.5% 포함) 수준입니다.",
+              },
+              {
+                q: "본사에 지급하는 비용(로열티·앱교재비)은 얼마인가요?",
+                a: "본사 공급원가는 매출액의 22.5%입니다 — 매출 연동 로열티 10%(신규 프로그램·교재 업데이트, SV 컨설팅 포함, 하한선 월 250만원) + 앱 교재비 12.5%(회원 1인 6개월 60만원, 학습앱·디지털 교재 라이선스). 음식점의 재료비에 해당하며, 매출의 77.5%가 가맹점주에게 남습니다.",
               },
               {
                 q: "손익분기점은 언제쯤 도달하나요?",
-                a: "월 신규등록 3~4명이 BEP 지점입니다(월 지출 1,800만원 기준). 5명 확보 시 월 순이익 600만원, 7명 시 1,560만원, 10명 시 3,000만원 구간입니다.",
+                a: "월 신규등록 3~4명이 BEP 지점입니다(월 지출 1,800만원 · 본사 공급원가 22.5% 포함 기준). 5명 확보 시 월 순이익 600만원, 7명 시 1,560만원, 10명 시 3,000만원 구간입니다.",
               },
               {
                 q: "등록 방식은 어떻게 되나요?",

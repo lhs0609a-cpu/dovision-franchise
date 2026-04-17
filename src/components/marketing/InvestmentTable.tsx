@@ -37,15 +37,33 @@ const deposit = {
   amount: "2,500~3,000만원",
 };
 
-// 월 운영비 1,300~1,800만원 (기본계획서 기준)
-const monthlyItems = [
+// 월 운영비 (기본계획서 + 본사 공급원가 22.5% 구조)
+// 매출연동(로얄티 10% + 앱교재비 12.5%)은 5명/월 신규등록 기준 예시 금액
+type MonthlyItem = {
+  category: string;
+  amount: string;
+  detail?: string;
+  highlight?: boolean;
+};
+const monthlyItems: MonthlyItem[] = [
   { category: "건물 임대료 · 관리비", amount: "250만원" },
   {
     category: "인건비",
     detail: "정교사 1명(300~350) + 보조교사 2명(200~250)",
     amount: "850만원",
   },
-  { category: "로얄티", detail: "매출액의 10% (기본 250만원)", amount: "250만원~" },
+  {
+    category: "로얄티",
+    detail: "매출액의 10% · 신규프로그램·SV 방문 포함",
+    amount: "매출 × 10%",
+    highlight: true,
+  },
+  {
+    category: "앱 교재비",
+    detail: "매출액의 12.5% · 본사 공급 (회원 1인 6개월 60만원)",
+    amount: "매출 × 12.5%",
+    highlight: true,
+  },
   { category: "세금 · 홍보운영비", amount: "250~350만원" },
   {
     category: "뇌기능검사 분석비 · 훈련",
@@ -147,7 +165,10 @@ export default function InvestmentTable() {
                 </TableHeader>
                 <TableBody>
                   {monthlyItems.map((item) => (
-                    <TableRow key={item.category}>
+                    <TableRow
+                      key={item.category}
+                      className={item.highlight ? "bg-primary/5" : ""}
+                    >
                       <TableCell>
                         <p className="font-semibold">{item.category}</p>
                         {item.detail && (
@@ -156,18 +177,34 @@ export default function InvestmentTable() {
                           </p>
                         )}
                       </TableCell>
-                      <TableCell className="text-right font-bold">
+                      <TableCell
+                        className={`text-right font-bold ${
+                          item.highlight ? "text-primary" : ""
+                        }`}
+                      >
                         {item.amount}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              <p className="mt-4 rounded-lg bg-primary/5 p-3 text-[12px] leading-[1.6] text-muted-foreground sm:text-[13px]">
-                ※ 상기 금액은 정상 운영(정교사 1 · 보조교사 2) 기준입니다.
-                초기 오픈 단계에서는 인건비·홍보비가 조정되어 월 1,300만원 수준에서
-                시작할 수 있습니다.
-              </p>
+              <div className="mt-4 space-y-2">
+                <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-[12px] leading-[1.65] sm:text-[13px]">
+                  <p className="font-bold text-primary">
+                    본사 공급원가 = 매출액의 22.5%
+                  </p>
+                  <p className="mt-1 text-muted-foreground">
+                    로얄티 10% + 앱 교재비 12.5% (음식점의 &ldquo;재료비&rdquo;
+                    개념). 매출의 77.5%가 가맹점주에게 남습니다. 5명/월 등록 기준
+                    약 540만원.
+                  </p>
+                </div>
+                <p className="rounded-lg bg-muted/40 p-3 text-[12px] leading-[1.6] text-muted-foreground sm:text-[13px]">
+                  ※ 상기 금액은 정상 운영(정교사 1 · 보조교사 2) 기준이며 본사
+                  공급원가 포함입니다. 초기 오픈 단계에서는 인건비·홍보비가
+                  조정되어 월 1,300만원 수준에서 시작할 수 있습니다.
+                </p>
+              </div>
             </div>
           </SectionFadeIn>
         </div>
