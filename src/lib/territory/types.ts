@@ -8,20 +8,30 @@
 export type TerritoryInput = {
   /** 사용자가 입력한 주소 또는 지역명 */
   address: string;
-  /** 위도 (선택, 지도 클릭 시) */
+  /** 위도 (지도 클릭/검색 시 설정) */
   lat?: number;
-  /** 위도 (선택, 지도 클릭 시) */
+  /** 경도 (지도 클릭/검색 시 설정) */
   lng?: number;
   /** 분석 반경 (km), 기본 2km */
   radiusKm: number;
 };
 
+/** 데이터 출처 */
+export type DataSource = "kakao-local-api" | "mock-simulation";
+
 export type School = {
   name: string;
   level: "초등" | "중학교" | "고등학교";
+  /** 학생수 (NEIS 연동 전까지는 평균 추정치) */
   studentCount: number;
   /** 후보 입지로부터의 직선거리 (m) */
   distanceM: number;
+  /** 카카오 상세 주소 (실제 데이터일 때만) */
+  address?: string;
+  /** 카카오 장소 상세 URL (검증용, 실제 데이터일 때만) */
+  placeUrl?: string;
+  /** true면 일부 필드가 추정값 (예: studentCount) */
+  estimated?: boolean;
 };
 
 export type Academy = {
@@ -30,16 +40,22 @@ export type Academy = {
   /** 두비전과 직접 경쟁하는지 여부 */
   isCompetitor: boolean;
   distanceM: number;
+  address?: string;
+  placeUrl?: string;
 };
 
 export type ApartmentCluster = {
   name: string;
+  /** 가구수 (국토부 API 연동 전까지는 0 또는 추정치) */
   households: number;
-  /** 평균 매매가 (만원) */
+  /** 평균 매매가 (만원) — 국토부 API 연동 전까지 0 또는 추정치 */
   avgPriceMillion: number;
   /** 평균 평형 (평) */
   avgPyeong: number;
   distanceM: number;
+  address?: string;
+  placeUrl?: string;
+  estimated?: boolean;
 };
 
 export type Demographics = {
@@ -121,4 +137,8 @@ export type TerritoryAnalysis = {
   report: AIReport;
   /** 분석 실행 시각 (ISO 문자열) */
   analyzedAt: string;
+  /** 데이터 출처 */
+  dataSource: DataSource;
+  /** 실제 데이터 사용 여부 */
+  isRealData: boolean;
 };

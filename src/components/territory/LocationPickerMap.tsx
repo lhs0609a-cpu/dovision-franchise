@@ -4,138 +4,170 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Crosshair, MapPin } from "lucide-react";
 
 // ============================================================
-// 입지 선택 지도
+// 입지 선택 지도 (Google Maps JavaScript API)
 // ============================================================
-// Leaflet을 CDN에서 동적 로드 → npm 의존성 0
-// 클릭 → 좌표 → Nominatim 역지오코딩으로 한국어 주소 자동 반환
-// 향후 카카오맵 SDK 어댑터로 교체 가능 (props 인터페이스 유지)
+// API 키: NEXT_PUBLIC_GOOGLE_MAPS_API_KEY (HTTP referer 제한 필수)
+// 클릭 → 좌표 + Geocoding으로 한국어 주소 자동 반환
+// 외부 검색 trigger → Geocoding으로 좌표 이동 + 반경 원 렌더
 // ============================================================
 
-const LEAFLET_CSS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-const LEAFLET_JS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-const NOMINATIM_BASE = "https://nominatim.openstreetmap.org";
-
-// 서울 시청 (기본 중심점)
-const DEFAULT_CENTER: [number, number] = [37.5665, 126.978];
+const GMAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+const GMAPS_SCRIPT_ID = "google-maps-js";
+// 서울 시청 기본 중심
+const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 };
 const DEFAULT_ZOOM = 12;
 
-// minimal Leaflet types (CDN 로드라 @types/leaflet 의존 없이 정의)
-type LMap = {
-  setView: (latlng: [number, number], zoom?: number) => LMap;
-  on: (evt: string, fn: (e: { latlng: { lat: number; lng: number } }) => void) => void;
-  removeLayer: (layer: unknown) => void;
-  invalidateSize: () => void;
-  remove: () => void;
+// 최소 Google Maps 타입
+type LatLng = { lat: number; lng: number };
+type GMap = {
+  setCenter: (c: LatLng) => void;
+  setZoom: (z: number) => void;
+  panTo: (c: LatLng) => void;
+  addListener: (evt: string, fn: (e: { latLng: GLatLng }) => void) => void;
+  fitBounds: (b: unknown) => void;
 };
-type LMarker = { addTo: (m: LMap) => LMarker; setLatLng: (latlng: [number, number]) => LMarker };
-type LCircle = { addTo: (m: LMap) => LCircle; setLatLng: (latlng: [number, number]) => LCircle; setRadius: (r: number) => LCircle };
-type LeafletGlobal = {
-  map: (el: HTMLElement) => LMap;
-  tileLayer: (url: string, opts?: Record<string, unknown>) => { addTo: (m: LMap) => unknown };
-  marker: (latlng: [number, number], opts?: Record<string, unknown>) => LMarker;
-  circle: (latlng: [number, number], opts?: Record<string, unknown>) => LCircle;
-  divIcon: (opts: Record<string, unknown>) => unknown;
+type GLatLng = {
+  lat: () => number;
+  lng: () => number;
+  toJSON: () => LatLng;
+};
+type GMarker = {
+  setPosition: (c: LatLng) => void;
+  setMap: (m: GMap | null) => void;
+};
+type GCircle = {
+  setCenter: (c: LatLng) => void;
+  setRadius: (r: number) => void;
+  setMap: (m: GMap | null) => void;
+};
+type GGeocoderResult = {
+  formatted_address: string;
+  address_components: Array<{
+    long_name: string;
+    short_name: string;
+    types: string[];
+  }>;
+  geometry: { location: GLatLng };
+};
+type GGeocoderStatus = "OK" | "ZERO_RESULTS" | "ERROR" | string;
+type GGeocoder = {
+  geocode: (
+    req: { location?: LatLng; address?: string; region?: string; language?: string },
+    cb: (results: GGeocoderResult[] | null, status: GGeocoderStatus) => void
+  ) => void;
+};
+type GoogleMaps = {
+  Map: new (el: HTMLElement, opts: Record<string, unknown>) => GMap;
+  Marker: new (opts: Record<string, unknown>) => GMarker;
+  Circle: new (opts: Record<string, unknown>) => GCircle;
+  Geocoder: new () => GGeocoder;
+  SymbolPath: { CIRCLE: number };
+  Animation: { DROP: number };
+  event: { addListenerOnce: (m: unknown, e: string, fn: () => void) => void };
 };
 
 declare global {
   interface Window {
-    L?: LeafletGlobal;
+    google?: { maps: GoogleMaps };
+    __initDovisionGmap?: () => void;
   }
 }
 
-let leafletLoadPromise: Promise<LeafletGlobal> | null = null;
+let gmapLoadPromise: Promise<GoogleMaps> | null = null;
 
-function loadLeaflet(): Promise<LeafletGlobal> {
+function loadGoogleMaps(): Promise<GoogleMaps> {
   if (typeof window === "undefined") return Promise.reject(new Error("SSR"));
-  if (window.L) return Promise.resolve(window.L);
-  if (leafletLoadPromise) return leafletLoadPromise;
+  if (window.google?.maps) return Promise.resolve(window.google.maps);
+  if (gmapLoadPromise) return gmapLoadPromise;
 
-  leafletLoadPromise = new Promise<LeafletGlobal>((resolve, reject) => {
-    // CSS
-    if (!document.querySelector(`link[href="${LEAFLET_CSS_URL}"]`)) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = LEAFLET_CSS_URL;
-      link.integrity = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
-      link.crossOrigin = "";
-      document.head.appendChild(link);
-    }
-    // JS
-    const existing = document.querySelector<HTMLScriptElement>(
-      `script[src="${LEAFLET_JS_URL}"]`
-    );
-    if (existing) {
-      existing.addEventListener("load", () =>
-        window.L ? resolve(window.L) : reject(new Error("Leaflet not loaded"))
-      );
+  gmapLoadPromise = new Promise<GoogleMaps>((resolve, reject) => {
+    if (!GMAPS_API_KEY) {
+      reject(new Error("NEXT_PUBLIC_GOOGLE_MAPS_API_KEY not set"));
       return;
     }
+    const existing = document.getElementById(GMAPS_SCRIPT_ID);
+    if (existing) {
+      const check = () => {
+        if (window.google?.maps) resolve(window.google.maps);
+        else setTimeout(check, 80);
+      };
+      check();
+      return;
+    }
+    window.__initDovisionGmap = () => {
+      if (window.google?.maps) resolve(window.google.maps);
+      else reject(new Error("Google Maps failed to initialize"));
+    };
     const script = document.createElement("script");
-    script.src = LEAFLET_JS_URL;
-    script.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
-    script.crossOrigin = "";
+    script.id = GMAPS_SCRIPT_ID;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GMAPS_API_KEY}&language=ko&region=KR&libraries=places&callback=__initDovisionGmap`;
     script.async = true;
-    script.onload = () =>
-      window.L ? resolve(window.L) : reject(new Error("Leaflet not loaded"));
-    script.onerror = () => reject(new Error("Failed to load Leaflet from CDN"));
+    script.defer = true;
+    script.onerror = () =>
+      reject(new Error("Failed to load Google Maps script"));
     document.head.appendChild(script);
   });
-  return leafletLoadPromise;
+  return gmapLoadPromise;
 }
 
 // ----------------------------------------------------------
-// 역지오코딩 (Nominatim)
+// 좌표 → 한국 주소 (Geocoder)
 // ----------------------------------------------------------
-async function reverseGeocode(lat: number, lng: number): Promise<string> {
-  try {
-    const url = `${NOMINATIM_BASE}/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=ko`;
-    const res = await fetch(url, {
-      headers: { "Accept-Language": "ko" },
-    });
-    if (!res.ok) throw new Error("nominatim error");
-    const data: {
-      display_name?: string;
-      address?: Record<string, string>;
-    } = await res.json();
-    // 한국어 주소 조립 (도/시 + 시/군/구 + 동/읍/면 + 도로명)
-    if (data.address) {
-      const a = data.address;
-      const parts = [
-        a.state || a.province,
-        a.city || a.town || a.county,
-        a.borough || a.city_district || a.suburb,
-        a.neighbourhood || a.quarter,
-        a.road,
-      ].filter(Boolean);
-      if (parts.length >= 2) return parts.join(" ");
-    }
-    return data.display_name?.split(",").slice(0, 4).reverse().join(" ") || "";
-  } catch {
-    return `(${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-  }
+async function reverseGeocode(
+  gmaps: GoogleMaps,
+  lat: number,
+  lng: number
+): Promise<string> {
+  return new Promise((resolve) => {
+    const geo = new gmaps.Geocoder();
+    geo.geocode(
+      { location: { lat, lng }, language: "ko", region: "KR" },
+      (results, status) => {
+        if (status !== "OK" || !results || !results.length) {
+          resolve(`(${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+          return;
+        }
+        // 한국 주소 우선: 도로명 주소 포함된 결과, 없으면 formatted_address
+        const best =
+          results.find((r) =>
+            r.address_components.some((c) => c.types.includes("premise"))
+          ) || results[0];
+        // "대한민국" 제거, 앞 4조각 추출
+        const cleaned = best.formatted_address
+          .replace(/^대한민국\s*/, "")
+          .replace(/\s*,\s*/g, " ")
+          .trim();
+        resolve(cleaned);
+      }
+    );
+  });
 }
 
 // ----------------------------------------------------------
-// 정지오코딩 (Nominatim) - 주소 → 좌표
+// 주소 → 좌표 (Geocoder)
 // ----------------------------------------------------------
 async function forwardGeocode(
+  gmaps: GoogleMaps,
   query: string
 ): Promise<{ lat: number; lng: number; displayName: string } | null> {
-  try {
-    const url = `${NOMINATIM_BASE}/search?format=json&q=${encodeURIComponent(query)}&countrycodes=kr&limit=1&accept-language=ko`;
-    const res = await fetch(url, { headers: { "Accept-Language": "ko" } });
-    if (!res.ok) return null;
-    const arr: Array<{ lat: string; lon: string; display_name: string }> =
-      await res.json();
-    if (!arr.length) return null;
-    return {
-      lat: parseFloat(arr[0].lat),
-      lng: parseFloat(arr[0].lon),
-      displayName: arr[0].display_name,
-    };
-  } catch {
-    return null;
-  }
+  return new Promise((resolve) => {
+    const geo = new gmaps.Geocoder();
+    geo.geocode(
+      { address: query, language: "ko", region: "KR" },
+      (results, status) => {
+        if (status !== "OK" || !results || !results.length) {
+          resolve(null);
+          return;
+        }
+        const r = results[0];
+        resolve({
+          lat: r.geometry.location.lat(),
+          lng: r.geometry.location.lng(),
+          displayName: r.formatted_address.replace(/^대한민국\s*/, ""),
+        });
+      }
+    );
+  });
 }
 
 // ============================================================
@@ -156,42 +188,52 @@ export default function LocationPickerMap({
   searchTrigger,
 }: LocationPickerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<LMap | null>(null);
-  const markerRef = useRef<LMarker | null>(null);
-  const circleRef = useRef<LCircle | null>(null);
-  const leafletRef = useRef<LeafletGlobal | null>(null);
+  const mapRef = useRef<GMap | null>(null);
+  const markerRef = useRef<GMarker | null>(null);
+  const circleRef = useRef<GCircle | null>(null);
+  const gmapsRef = useRef<GoogleMaps | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading"
   );
+  const [errorMsg, setErrorMsg] = useState<string>("");
   const [hint, setHint] = useState<string>("지도에서 후보 지점을 클릭하세요");
   const [isResolving, setIsResolving] = useState(false);
 
   // 지도 초기화
   useEffect(() => {
     let cancelled = false;
-    loadLeaflet()
-      .then((L) => {
+    loadGoogleMaps()
+      .then((gmaps) => {
         if (cancelled || !containerRef.current) return;
-        leafletRef.current = L;
-        const map = L.map(containerRef.current).setView(
-          DEFAULT_CENTER,
-          DEFAULT_ZOOM
-        );
-        L.tileLayer(
-          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          {
-            attribution:
-              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 19,
-          }
-        ).addTo(map);
+        gmapsRef.current = gmaps;
 
-        map.on("click", async (e) => {
-          const { lat, lng } = e.latlng;
+        const map = new gmaps.Map(containerRef.current, {
+          center: DEFAULT_CENTER,
+          zoom: DEFAULT_ZOOM,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          clickableIcons: false,
+          gestureHandling: "greedy",
+          styles: [
+            {
+              featureType: "poi.business",
+              stylers: [{ visibility: "off" }],
+            },
+            {
+              featureType: "transit",
+              stylers: [{ visibility: "simplified" }],
+            },
+          ],
+        });
+
+        map.addListener("click", async (e: { latLng: GLatLng }) => {
+          const lat = e.latLng.lat();
+          const lng = e.latLng.lng();
           placeMarker(lat, lng);
           setIsResolving(true);
           setHint("주소를 가져오는 중...");
-          const addr = await reverseGeocode(lat, lng);
+          const addr = await reverseGeocode(gmaps, lat, lng);
           setIsResolving(false);
           setHint(addr ? `선택된 위치: ${addr}` : "주소를 찾을 수 없습니다");
           onSelect({ lat, lng, address: addr });
@@ -199,43 +241,48 @@ export default function LocationPickerMap({
 
         mapRef.current = map;
         setStatus("ready");
-        // 컨테이너 크기 보정
-        setTimeout(() => map.invalidateSize(), 100);
       })
-      .catch(() => setStatus("error"));
+      .catch((err) => {
+        setErrorMsg(
+          err?.message?.includes("API_KEY")
+            ? "Google Maps API 키가 설정되지 않았습니다."
+            : "지도를 불러올 수 없습니다. API 키의 HTTP referer 제한과 결제 설정을 확인해주세요."
+        );
+        setStatus("error");
+      });
 
     return () => {
       cancelled = true;
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+      if (markerRef.current) markerRef.current.setMap(null);
+      if (circleRef.current) circleRef.current.setMap(null);
       markerRef.current = null;
       circleRef.current = null;
+      mapRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 외부 검색 트리거 → 정지오코딩 → 지도 이동
+  // 외부 검색 트리거
   useEffect(() => {
     if (!searchTrigger || !searchTrigger.query.trim()) return;
-    if (!mapRef.current || !leafletRef.current) return;
+    const gmaps = gmapsRef.current;
+    const map = mapRef.current;
+    if (!gmaps || !map) return;
     let cancelled = false;
     setIsResolving(true);
     setHint(`"${searchTrigger.query}" 검색 중...`);
-    forwardGeocode(searchTrigger.query).then((res) => {
+    forwardGeocode(gmaps, searchTrigger.query).then((res) => {
       if (cancelled) return;
       setIsResolving(false);
       if (res) {
-        mapRef.current?.setView([res.lat, res.lng], 14);
+        map.panTo({ lat: res.lat, lng: res.lng });
+        map.setZoom(15);
         placeMarker(res.lat, res.lng);
-        setHint(
-          `검색 결과: ${res.displayName.split(",").slice(0, 4).reverse().join(" ")}`
-        );
+        setHint(`검색 결과: ${res.displayName}`);
         onSelect({
           lat: res.lat,
           lng: res.lng,
-          address: searchTrigger.query,
+          address: res.displayName,
         });
       } else {
         setHint(
@@ -249,7 +296,7 @@ export default function LocationPickerMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTrigger?.nonce]);
 
-  // 반경 변경 시 원 갱신
+  // 반경 변경 반영
   useEffect(() => {
     if (circleRef.current && radiusKm > 0) {
       circleRef.current.setRadius(radiusKm * 1000);
@@ -257,34 +304,44 @@ export default function LocationPickerMap({
   }, [radiusKm]);
 
   function placeMarker(lat: number, lng: number) {
-    const L = leafletRef.current;
+    const gmaps = gmapsRef.current;
     const map = mapRef.current;
-    if (!L || !map) return;
+    if (!gmaps || !map) return;
 
     if (markerRef.current) {
-      markerRef.current.setLatLng([lat, lng]);
+      markerRef.current.setPosition({ lat, lng });
     } else {
-      const icon = L.divIcon({
-        className: "dovision-pin",
-        html: `<div style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:oklch(0.45 0.18 290);color:white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 4px 10px rgba(0,0,0,0.35);border:2px solid white;"><span style="transform:rotate(45deg);font-weight:900;font-size:14px;">★</span></div>`,
-        iconSize: [34, 34],
-        iconAnchor: [17, 32],
+      markerRef.current = new gmaps.Marker({
+        position: { lat, lng },
+        map,
+        title: "후보 지점",
+        animation: gmaps.Animation.DROP,
+        icon: {
+          path: gmaps.SymbolPath.CIRCLE,
+          scale: 10,
+          fillColor: "#7c3aed",
+          fillOpacity: 1,
+          strokeColor: "#ffffff",
+          strokeWeight: 3,
+        },
       });
-      markerRef.current = L.marker([lat, lng], { icon }).addTo(map);
     }
 
     if (circleRef.current) {
-      circleRef.current.setLatLng([lat, lng]);
+      circleRef.current.setCenter({ lat, lng });
       circleRef.current.setRadius(radiusKm * 1000);
     } else {
-      circleRef.current = L.circle([lat, lng], {
+      circleRef.current = new gmaps.Circle({
+        center: { lat, lng },
         radius: radiusKm * 1000,
-        color: "oklch(0.45 0.18 290)",
-        weight: 2,
-        opacity: 0.6,
-        fillColor: "oklch(0.45 0.18 290)",
+        map,
+        strokeColor: "#7c3aed",
+        strokeOpacity: 0.65,
+        strokeWeight: 2,
+        fillColor: "#7c3aed",
         fillOpacity: 0.08,
-      }).addTo(map);
+        clickable: false,
+      });
     }
   }
 
@@ -309,23 +366,23 @@ export default function LocationPickerMap({
         />
 
         {status === "loading" && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur">
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
               <p className="text-[12px] font-semibold">
-                지도를 불러오는 중...
+                Google Maps를 불러오는 중...
               </p>
             </div>
           </div>
         )}
 
         {status === "error" && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/95">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/95 p-6">
             <div className="text-center text-[12px]">
               <MapPin className="mx-auto mb-2 h-6 w-6 text-rose-500" />
               <p className="font-bold">지도를 불러올 수 없습니다</p>
-              <p className="mt-1 text-muted-foreground">
-                네트워크 상태를 확인하거나 주소를 직접 입력해주세요.
+              <p className="mt-1 max-w-[320px] text-muted-foreground">
+                {errorMsg}
               </p>
             </div>
           </div>
@@ -333,8 +390,8 @@ export default function LocationPickerMap({
       </div>
 
       <p className="mt-2 text-[10.5px] text-muted-foreground">
-        지도 데이터: © OpenStreetMap · 주소 검색: Nominatim · 향후 카카오맵 SDK
-        교체 예정
+        지도: Google Maps · 장소 검색: Kakao 로컬 API · 주소 검색: Google
+        Geocoding
       </p>
     </div>
   );

@@ -30,6 +30,10 @@ import {
   projectRevenue,
 } from "@/lib/territory/demand-model";
 import { generateAIReport } from "@/lib/territory/ai-report";
+import {
+  fetchRealPlaces,
+  estimateDemographicsFromPlaces,
+} from "@/lib/territory/fetch-places";
 import type {
   TerritoryAnalysis,
   TerritoryInput,
@@ -52,9 +56,13 @@ const PRESET_LOCATIONS = [
 
 export default function TerritoryClient() {
   const [address, setAddress] = useState("");
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
   const [radiusKm, setRadiusKm] = useState(2);
   const [analysis, setAnalysis] = useState<TerritoryAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [mapSearchTrigger, setMapSearchTrigger] = useState<{
     query: string;
     nonce: number;
@@ -66,6 +74,7 @@ export default function TerritoryClient() {
     address: string;
   }) => {
     if (info.address) setAddress(info.address);
+    setCoords({ lat: info.lat, lng: info.lng });
   };
 
   const handleAddressSearch = () => {
@@ -77,30 +86,67 @@ export default function TerritoryClient() {
     if (!address.trim()) return;
     setIsAnalyzing(true);
     setAnalysis(null);
+    setAnalysisError(null);
 
-    // 분석 진행감을 위해 짧은 지연 (실제 API 호출 시 자연스럽게 됨)
-    await new Promise((r) => setTimeout(r, 1200));
+    const input: TerritoryInput = {
+      address: address.trim(),
+      radiusKm,
+      lat: coords?.lat,
+      lng: coords?.lng,
+    };
 
-    const input: TerritoryInput = { address: address.trim(), radiusKm };
-    const territory = generateTerritoryData(input.address, radiusKm);
-    const demand = estimateDemand(
-      territory.schools,
-      territory.academies,
-      territory.demographics
-    );
-    const score = calculateScore(
-      territory.schools,
-      territory.academies,
-      territory.apartments,
-      territory.demographics
-    );
+    let schools;
+    let academies;
+    let apartments;
+    let demographics;
+    let isRealData = false;
+    let dataSource: "kakao-local-api" | "mock-simulation" = "mock-simulation";
+
+    try {
+      // 좌표가 있으면 카카오 실데이터 우선 시도
+      if (coords) {
+        const real = await fetchRealPlaces(coords.lat, coords.lng, radiusKm);
+        if (real.schools.length === 0 && real.academies.length === 0) {
+          throw new Error("주변에 카카오 검색 결과가 없습니다");
+        }
+        schools = real.schools;
+        academies = real.academies;
+        apartments = real.apartments;
+        demographics = estimateDemographicsFromPlaces(
+          schools,
+          apartments,
+          radiusKm
+        );
+        isRealData = true;
+        dataSource = "kakao-local-api";
+      } else {
+        throw new Error("좌표 없음 — mock fallback");
+      }
+    } catch (err) {
+      // Fallback: mock 데이터
+      const territory = generateTerritoryData(input.address, radiusKm);
+      schools = territory.schools;
+      academies = territory.academies;
+      apartments = territory.apartments;
+      demographics = territory.demographics;
+      isRealData = false;
+      dataSource = "mock-simulation";
+      if (err instanceof Error && !err.message.includes("좌표 없음")) {
+        setAnalysisError(
+          `실시간 데이터 조회 실패 — 시뮬레이션 데이터로 대체: ${err.message}`
+        );
+      }
+    }
+
+    const demand = estimateDemand(schools, academies, demographics);
+    const score = calculateScore(schools, academies, apartments, demographics);
     const revenue = projectRevenue(demand.standardSignupsPerMonth);
     const report = generateAIReport({
       address: input.address,
-      schools: territory.schools,
-      academies: territory.academies,
-      apartments: territory.apartments,
-      demographics: territory.demographics,
+      schools,
+      academies,
+      apartments,
+      demographics,
       demand,
       revenue,
       score,
@@ -108,12 +154,17 @@ export default function TerritoryClient() {
 
     setAnalysis({
       input,
-      ...territory,
+      schools,
+      academies,
+      apartments,
+      demographics,
       demand,
       revenue,
       score,
       report,
       analyzedAt: new Date().toISOString(),
+      dataSource,
+      isRealData,
     });
     setIsAnalyzing(false);
   };
@@ -121,6 +172,8 @@ export default function TerritoryClient() {
   const reset = () => {
     setAnalysis(null);
     setAddress("");
+    setCoords(null);
+    setAnalysisError(null);
   };
 
   const handlePrint = () => {
@@ -149,27 +202,35 @@ export default function TerritoryClient() {
         </div>
       </section>
 
-      {/* DEMO 경고 배너 */}
+      {/* 데이터 출처 안내 */}
       <section className="pt-6 print:hidden">
         <div className="container-responsive max-w-5xl">
-          <div className="flex items-start gap-3 rounded-xl border-2 border-amber-400 bg-amber-50 p-4 shadow-sm sm:items-center">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-400">
-              <AlertTriangle className="h-5 w-5 text-white" />
+          <div className="flex items-start gap-3 rounded-xl border-2 border-emerald-400 bg-emerald-50 p-4 shadow-sm sm:items-center">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500">
+              <CheckCircle2 className="h-5 w-5 text-white" />
             </div>
-            <div className="flex-1 text-[12px] leading-[1.65] text-amber-900 sm:text-[13px]">
-              <p className="font-bold text-amber-900">
-                🚧 BETA · 시뮬레이션 데이터로 동작 중입니다
+            <div className="flex-1 text-[12px] leading-[1.65] text-emerald-900 sm:text-[13px]">
+              <p className="font-bold text-emerald-900">
+                ✓ 실시간 데이터 연동 — Google Maps + Kakao 로컬 API
               </p>
               <p className="mt-1">
-                현재 표시되는 <strong>학교·학원 이름(예: 한솔초등, 신성중학 등)은 가상의 샘플이며</strong>,
-                실제 해당 지역에 존재하는 학교 명단이 아닙니다. 수요 공식/점수
-                모델은 동일하게 작동하므로 구조 검토용으로는 유용하지만,{" "}
-                <strong>고객 상담 시에는 반드시 &ldquo;시뮬레이션&rdquo;임을 안내</strong>해
-                주세요. 정식 버전(NEIS 학교 데이터 + 카카오 로컬 API + 국토부 실거래가 +
-                통계청 인구)은 API 키 발급 후 연동 예정입니다.
+                지도는 <strong>Google Maps</strong>, 학교·학원은{" "}
+                <strong>카카오 로컬 API(실제 상호명)</strong>로 조회됩니다. 각
+                장소명 옆의 &ldquo;카카오↗&rdquo; 링크로 원본 상세를 확인할 수
+                있습니다.
+                <br />
+                <strong>추정값 항목 (별도 표시):</strong> 학교 학생수 (NEIS 연동
+                전 평균값), 아파트 가구수/시세 (국토부 API 연동 전), 인구·소득
+                (통계청 SGIS 연동 전).
               </p>
             </div>
           </div>
+          {analysisError && (
+            <div className="mt-3 flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-[12px] text-amber-900">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              <p>{analysisError}</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -348,21 +409,35 @@ function AnalysisResult({
         </button>
       </div>
 
-      {/* DEMO 경고 (결과 상단 — 인쇄에도 포함) */}
-      <div className="mb-6 flex items-start gap-3 rounded-xl border-2 border-amber-400 bg-amber-50 p-4">
-        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
-        <div className="flex-1 text-[12px] leading-[1.65] text-amber-900">
-          <p className="font-bold">
-            본 리포트는 시뮬레이션 데이터로 작성된 예시입니다
-          </p>
-          <p className="mt-0.5">
-            표시되는 학교·학원 명칭은 가상의 샘플이며, 정식 버전은 NEIS·카카오·
-            국토부·통계청 실시간 공공데이터로 교체됩니다. 수요 추정 공식과
-            수익 모델(본사 공급원가 22.5%)은 실제 직영 데이터 기반이므로 구조
-            검토용으로 활용 가능합니다.
-          </p>
+      {/* 데이터 출처 배지 (인쇄에도 포함) */}
+      {analysis.isRealData ? (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border-2 border-emerald-400 bg-emerald-50 p-4">
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+          <div className="flex-1 text-[12px] leading-[1.65] text-emerald-900">
+            <p className="font-bold">
+              ✓ Kakao 로컬 API 실시간 데이터 기반 리포트
+            </p>
+            <p className="mt-0.5">
+              학교·학원 명칭은 카카오 로컬 API에서 실시간 조회된 실제 상호명입니다.
+              학생수는 NEIS 연동 전까지 평균 추정치(초 650·중 550·고 500)를
+              사용합니다.
+            </p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border-2 border-amber-400 bg-amber-50 p-4">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+          <div className="flex-1 text-[12px] leading-[1.65] text-amber-900">
+            <p className="font-bold">
+              본 리포트는 시뮬레이션 데이터로 작성된 예시입니다
+            </p>
+            <p className="mt-0.5">
+              지도에서 후보 지점을 클릭하거나 주소를 검색해 좌표를 설정하면 카카오
+              실데이터로 자동 전환됩니다.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ======== 1. 종합 점수 + 헤드라인 ======== */}
       <ScoreSection analysis={analysis} />
@@ -688,7 +763,7 @@ function SvgMap({ analysis }: { analysis: TerritoryAnalysis }) {
 // ============================================================
 
 function FacilitiesSection({ analysis }: { analysis: TerritoryAnalysis }) {
-  const { schools, academies, apartments } = analysis;
+  const { schools, academies, apartments, isRealData } = analysis;
   const elem = schools.filter((s) => s.level === "초등");
   const mid = schools.filter((s) => s.level === "중학교");
   const high = schools.filter((s) => s.level === "고등학교");
@@ -724,22 +799,45 @@ function FacilitiesSection({ analysis }: { analysis: TerritoryAnalysis }) {
             studentSum={high.reduce((s, x) => s + x.studentCount, 0)}
           />
           <div className="mt-3 max-h-[180px] space-y-1 overflow-auto">
-            {schools.slice(0, 8).map((s) => (
+            {schools.slice(0, 10).map((s, i) => (
               <div
-                key={s.name}
+                key={`${s.name}-${i}`}
                 className="flex items-center justify-between rounded-md bg-muted/30 px-2.5 py-1.5 text-[11px]"
               >
                 <span className="flex items-center gap-1.5 font-semibold">
-                  <span className="rounded bg-amber-200 px-1 text-[8px] font-black tracking-wider text-amber-900">
-                    예시
-                  </span>
-                  {s.name}
+                  {isRealData ? (
+                    s.placeUrl ? (
+                      <a
+                        href={s.placeUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline"
+                      >
+                        {s.name}{" "}
+                        <span className="text-[9px] text-primary">↗</span>
+                      </a>
+                    ) : (
+                      <span>{s.name}</span>
+                    )
+                  ) : (
+                    <>
+                      <span className="rounded bg-amber-200 px-1 text-[8px] font-black tracking-wider text-amber-900">
+                        예시
+                      </span>
+                      {s.name}
+                    </>
+                  )}
                 </span>
                 <span className="text-muted-foreground">
-                  {s.studentCount}명 · {s.distanceM}m
+                  {s.studentCount}명{s.estimated && "*"} · {s.distanceM}m
                 </span>
               </div>
             ))}
+            {isRealData && schools.some((s) => s.estimated) && (
+              <p className="pt-1 text-[9.5px] text-muted-foreground">
+                * 학생수는 평균 추정값 (NEIS 연동 전)
+              </p>
+            )}
           </div>
         </FacilityCard>
 
@@ -770,21 +868,35 @@ function FacilitiesSection({ analysis }: { analysis: TerritoryAnalysis }) {
             </div>
           </div>
           <div className="mt-3 max-h-[180px] space-y-1 overflow-auto">
-            {academies.slice(0, 8).map((a, i) => (
+            {academies.slice(0, 12).map((a, i) => (
               <div
                 key={`${a.name}-${i}`}
                 className="flex items-center justify-between rounded-md bg-muted/30 px-2.5 py-1.5 text-[11px]"
               >
                 <span className="flex items-center gap-1.5">
-                  <span className="rounded bg-amber-200 px-1 text-[8px] font-black tracking-wider text-amber-900">
-                    예시
-                  </span>
+                  {!isRealData && (
+                    <span className="rounded bg-amber-200 px-1 text-[8px] font-black tracking-wider text-amber-900">
+                      예시
+                    </span>
+                  )}
                   {a.isCompetitor && (
                     <span className="rounded bg-rose-500 px-1 text-[8px] font-bold text-white">
                       경쟁
                     </span>
                   )}
-                  <span className="font-semibold">{a.name}</span>
+                  {isRealData && a.placeUrl ? (
+                    <a
+                      href={a.placeUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-semibold hover:underline"
+                    >
+                      {a.name}{" "}
+                      <span className="text-[9px] text-primary">↗</span>
+                    </a>
+                  ) : (
+                    <span className="font-semibold">{a.name}</span>
+                  )}
                 </span>
                 <span className="text-muted-foreground">{a.distanceM}m</span>
               </div>
@@ -794,49 +906,81 @@ function FacilitiesSection({ analysis }: { analysis: TerritoryAnalysis }) {
 
         {/* 아파트 */}
         <FacilityCard title="아파트 단지" count={apartments.length} icon={Building2}>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-lg bg-primary/5 p-2.5 text-center">
-              <p className="text-[10px] font-bold text-primary">총 가구수</p>
-              <p className="mt-0.5 text-[18px] font-black text-primary">
-                {apartments
-                  .reduce((s, a) => s + a.households, 0)
-                  .toLocaleString()}
+          {isRealData ? (
+            <div className="rounded-lg border border-dashed border-border/60 bg-muted/30 p-3 text-[10.5px] leading-[1.6] text-muted-foreground">
+              <p className="font-bold text-foreground/80">
+                실시간 단지 목록 ({apartments.length}개)
+              </p>
+              <p className="mt-1">
+                가구수·평균 매매가·평형 데이터는 국토부 실거래가 API 연동 후
+                자동 표시됩니다.
               </p>
             </div>
-            <div className="rounded-lg bg-primary/5 p-2.5 text-center">
-              <p className="text-[10px] font-bold text-primary">평균 매매가</p>
-              <p className="mt-0.5 text-[18px] font-black text-primary">
-                {apartments.length
-                  ? (
-                      apartments.reduce(
-                        (s, a) => s + a.avgPriceMillion,
-                        0
-                      ) /
-                      apartments.length /
-                      10000
-                    ).toFixed(1)
-                  : 0}
-                억
-              </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-lg bg-primary/5 p-2.5 text-center">
+                <p className="text-[10px] font-bold text-primary">총 가구수</p>
+                <p className="mt-0.5 text-[18px] font-black text-primary">
+                  {apartments
+                    .reduce((s, a) => s + a.households, 0)
+                    .toLocaleString()}
+                </p>
+              </div>
+              <div className="rounded-lg bg-primary/5 p-2.5 text-center">
+                <p className="text-[10px] font-bold text-primary">평균 매매가</p>
+                <p className="mt-0.5 text-[18px] font-black text-primary">
+                  {apartments.length
+                    ? (
+                        apartments.reduce(
+                          (s, a) => s + a.avgPriceMillion,
+                          0
+                        ) /
+                        apartments.length /
+                        10000
+                      ).toFixed(1)
+                    : 0}
+                  억
+                </p>
+              </div>
             </div>
-          </div>
+          )}
           <div className="mt-3 max-h-[180px] space-y-1 overflow-auto">
-            {apartments.slice(0, 6).map((a) => (
+            {apartments.slice(0, 10).map((a, i) => (
               <div
-                key={a.name}
+                key={`${a.name}-${i}`}
                 className="rounded-md bg-muted/30 px-2.5 py-1.5 text-[11px]"
               >
                 <p className="flex items-center gap-1.5 font-semibold">
-                  <span className="rounded bg-amber-200 px-1 text-[8px] font-black tracking-wider text-amber-900">
-                    예시
-                  </span>
-                  {a.name}
+                  {!isRealData && (
+                    <span className="rounded bg-amber-200 px-1 text-[8px] font-black tracking-wider text-amber-900">
+                      예시
+                    </span>
+                  )}
+                  {isRealData && a.placeUrl ? (
+                    <a
+                      href={a.placeUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hover:underline"
+                    >
+                      {a.name}{" "}
+                      <span className="text-[9px] text-primary">↗</span>
+                    </a>
+                  ) : (
+                    <span>{a.name}</span>
+                  )}
                 </p>
-                <p className="text-[10px] text-muted-foreground">
-                  {a.households.toLocaleString()}세대 · 평균{" "}
-                  {a.avgPyeong}평 ·{" "}
-                  {(a.avgPriceMillion / 10000).toFixed(1)}억
-                </p>
+                {isRealData ? (
+                  <p className="text-[10px] text-muted-foreground">
+                    {a.distanceM}m · 시세·가구수는 국토부 API 연동 후 표시
+                  </p>
+                ) : (
+                  <p className="text-[10px] text-muted-foreground">
+                    {a.households.toLocaleString()}세대 · 평균{" "}
+                    {a.avgPyeong}평 ·{" "}
+                    {(a.avgPriceMillion / 10000).toFixed(1)}억
+                  </p>
+                )}
               </div>
             ))}
           </div>
