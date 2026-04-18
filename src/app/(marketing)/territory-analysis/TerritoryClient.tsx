@@ -21,6 +21,7 @@ import {
   RotateCcw,
   Loader2,
   Award,
+  Info,
 } from "lucide-react";
 import { generateTerritoryData } from "@/lib/territory/mock-data";
 import {
@@ -34,6 +35,7 @@ import type {
   TerritoryInput,
   TerritoryScore,
 } from "@/lib/territory/types";
+import LocationPickerMap from "@/components/territory/LocationPickerMap";
 
 // ============================================================
 // 두비전 AI 상권분석 도구
@@ -53,6 +55,23 @@ export default function TerritoryClient() {
   const [radiusKm, setRadiusKm] = useState(2);
   const [analysis, setAnalysis] = useState<TerritoryAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [mapSearchTrigger, setMapSearchTrigger] = useState<{
+    query: string;
+    nonce: number;
+  } | null>(null);
+
+  const handleMapSelect = (info: {
+    lat: number;
+    lng: number;
+    address: string;
+  }) => {
+    if (info.address) setAddress(info.address);
+  };
+
+  const handleAddressSearch = () => {
+    if (!address.trim()) return;
+    setMapSearchTrigger({ query: address.trim(), nonce: Date.now() });
+  };
 
   const runAnalysis = async () => {
     if (!address.trim()) return;
@@ -130,95 +149,143 @@ export default function TerritoryClient() {
         </div>
       </section>
 
-      {/* 입력 폼 */}
-      <section className="py-10 print:hidden">
-        <div className="container-responsive max-w-3xl">
+      {/* DEMO 경고 배너 */}
+      <section className="pt-6 print:hidden">
+        <div className="container-responsive max-w-5xl">
+          <div className="flex items-start gap-3 rounded-xl border-2 border-amber-400 bg-amber-50 p-4 shadow-sm sm:items-center">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-400">
+              <AlertTriangle className="h-5 w-5 text-white" />
+            </div>
+            <div className="flex-1 text-[12px] leading-[1.65] text-amber-900 sm:text-[13px]">
+              <p className="font-bold text-amber-900">
+                🚧 BETA · 시뮬레이션 데이터로 동작 중입니다
+              </p>
+              <p className="mt-1">
+                현재 표시되는 <strong>학교·학원 이름(예: 한솔초등, 신성중학 등)은 가상의 샘플이며</strong>,
+                실제 해당 지역에 존재하는 학교 명단이 아닙니다. 수요 공식/점수
+                모델은 동일하게 작동하므로 구조 검토용으로는 유용하지만,{" "}
+                <strong>고객 상담 시에는 반드시 &ldquo;시뮬레이션&rdquo;임을 안내</strong>해
+                주세요. 정식 버전(NEIS 학교 데이터 + 카카오 로컬 API + 국토부 실거래가 +
+                통계청 인구)은 API 키 발급 후 연동 예정입니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 입력 폼 + 지도 */}
+      <section className="py-8 print:hidden">
+        <div className="container-responsive max-w-5xl">
           <div className="rounded-2xl border border-border/60 bg-white p-6 shadow-sm sm:p-8">
             <div className="flex items-center gap-2">
               <Search className="h-5 w-5 text-primary" />
               <h2 className="text-[18px] font-bold sm:text-[20px]">
-                후보 지점 입력
+                후보 지점 선택
               </h2>
+              <span className="ml-auto rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
+                지도 클릭 or 주소 검색
+              </span>
             </div>
 
-            <div className="mt-5 grid gap-4">
-              <div>
-                <label className="mb-1.5 block text-[12px] font-semibold text-muted-foreground">
-                  주소 또는 지역명
-                </label>
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="예: 서울 강남구 대치동, 분당구 정자동"
-                  className="w-full rounded-lg border border-border bg-background px-4 py-3 text-[14px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !isAnalyzing) runAnalysis();
-                  }}
-                />
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  <span className="text-[11px] text-muted-foreground">
-                    빠른 입력:
-                  </span>
-                  {PRESET_LOCATIONS.map((p) => (
+            <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_360px]">
+              {/* 지도 */}
+              <LocationPickerMap
+                onSelect={handleMapSelect}
+                radiusKm={radiusKm}
+                searchTrigger={mapSearchTrigger}
+              />
+
+              {/* 우측 컨트롤 */}
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="mb-1.5 block text-[12px] font-semibold text-muted-foreground">
+                    주소 또는 지역명
+                  </label>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="예: 서울 강남구 대치동"
+                      className="flex-1 rounded-lg border border-border bg-background px-3 py-2.5 text-[13px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddressSearch();
+                      }}
+                    />
                     <button
-                      key={p}
                       type="button"
-                      onClick={() => setAddress(p)}
-                      className="rounded-full border border-border bg-muted/40 px-2.5 py-0.5 text-[11px] font-medium text-foreground/80 transition-colors hover:border-primary hover:text-primary"
+                      onClick={handleAddressSearch}
+                      disabled={!address.trim()}
+                      className="shrink-0 rounded-lg border border-border bg-muted/40 px-3 text-[12px] font-semibold transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
+                      aria-label="주소 검색"
                     >
-                      {p}
+                      <Search className="h-3.5 w-3.5" />
                     </button>
-                  ))}
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {PRESET_LOCATIONS.map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => {
+                          setAddress(p);
+                          setMapSearchTrigger({ query: p, nonce: Date.now() });
+                        }}
+                        className="rounded-full border border-border bg-muted/40 px-2 py-0.5 text-[10.5px] font-medium text-foreground/80 transition-colors hover:border-primary hover:text-primary"
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-[12px] font-semibold text-muted-foreground">
+                    분석 반경: {radiusKm}km
+                  </label>
+                  <input
+                    type="range"
+                    min={1}
+                    max={5}
+                    step={0.5}
+                    value={radiusKm}
+                    onChange={(e) => setRadiusKm(Number(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-[10px] text-muted-foreground">
+                    <span>1km</span>
+                    <span>3km</span>
+                    <span>5km</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={runAnalysis}
+                  disabled={!address.trim() || isAnalyzing}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-[14px] font-bold text-primary-foreground shadow-md transition-all hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      AI 분석 중...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      AI 상권분석 시작
+                    </>
+                  )}
+                </button>
+
+                <div className="flex items-start gap-1.5 rounded-lg bg-muted/40 p-2.5 text-[10.5px] leading-[1.6] text-muted-foreground">
+                  <Info className="mt-0.5 h-3 w-3 shrink-0" />
+                  <span>
+                    지도에서 <strong>클릭하거나</strong> 우측에 주소를 입력 후{" "}
+                    <strong>검색</strong>하면 후보 지점이 설정됩니다.
+                  </span>
                 </div>
               </div>
-
-              <div>
-                <label className="mb-1.5 block text-[12px] font-semibold text-muted-foreground">
-                  분석 반경: {radiusKm}km
-                </label>
-                <input
-                  type="range"
-                  min={1}
-                  max={5}
-                  step={0.5}
-                  value={radiusKm}
-                  onChange={(e) => setRadiusKm(Number(e.target.value))}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-[11px] text-muted-foreground">
-                  <span>1km (도보권)</span>
-                  <span>3km (생활권)</span>
-                  <span>5km (광역)</span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={runAnalysis}
-                disabled={!address.trim() || isAnalyzing}
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-[14px] font-bold text-primary-foreground shadow-md transition-all hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 sm:text-[15px]"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    AI 분석 중... (학교·학원·인구 데이터 수집)
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" />
-                    AI 상권분석 시작
-                  </>
-                )}
-              </button>
-
-              <p className="text-center text-[11px] leading-[1.6] text-muted-foreground">
-                ※ 본 분석은 NEIS 학교 데이터, 카카오 로컬 API, 국토부 실거래가,
-                통계청 인구 데이터를 종합합니다.
-                <br />
-                현재 베타 버전은 시뮬레이션 데이터로 동작하며, 정식 버전은 실시간
-                공공데이터를 사용합니다.
-              </p>
             </div>
           </div>
         </div>
@@ -279,6 +346,22 @@ function AnalysisResult({
           <Download className="h-3.5 w-3.5" />
           PDF 리포트 다운로드
         </button>
+      </div>
+
+      {/* DEMO 경고 (결과 상단 — 인쇄에도 포함) */}
+      <div className="mb-6 flex items-start gap-3 rounded-xl border-2 border-amber-400 bg-amber-50 p-4">
+        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+        <div className="flex-1 text-[12px] leading-[1.65] text-amber-900">
+          <p className="font-bold">
+            본 리포트는 시뮬레이션 데이터로 작성된 예시입니다
+          </p>
+          <p className="mt-0.5">
+            표시되는 학교·학원 명칭은 가상의 샘플이며, 정식 버전은 NEIS·카카오·
+            국토부·통계청 실시간 공공데이터로 교체됩니다. 수요 추정 공식과
+            수익 모델(본사 공급원가 22.5%)은 실제 직영 데이터 기반이므로 구조
+            검토용으로 활용 가능합니다.
+          </p>
+        </div>
       </div>
 
       {/* ======== 1. 종합 점수 + 헤드라인 ======== */}
@@ -646,7 +729,12 @@ function FacilitiesSection({ analysis }: { analysis: TerritoryAnalysis }) {
                 key={s.name}
                 className="flex items-center justify-between rounded-md bg-muted/30 px-2.5 py-1.5 text-[11px]"
               >
-                <span className="font-semibold">{s.name}</span>
+                <span className="flex items-center gap-1.5 font-semibold">
+                  <span className="rounded bg-amber-200 px-1 text-[8px] font-black tracking-wider text-amber-900">
+                    예시
+                  </span>
+                  {s.name}
+                </span>
                 <span className="text-muted-foreground">
                   {s.studentCount}명 · {s.distanceM}m
                 </span>
@@ -688,6 +776,9 @@ function FacilitiesSection({ analysis }: { analysis: TerritoryAnalysis }) {
                 className="flex items-center justify-between rounded-md bg-muted/30 px-2.5 py-1.5 text-[11px]"
               >
                 <span className="flex items-center gap-1.5">
+                  <span className="rounded bg-amber-200 px-1 text-[8px] font-black tracking-wider text-amber-900">
+                    예시
+                  </span>
                   {a.isCompetitor && (
                     <span className="rounded bg-rose-500 px-1 text-[8px] font-bold text-white">
                       경쟁
@@ -735,7 +826,12 @@ function FacilitiesSection({ analysis }: { analysis: TerritoryAnalysis }) {
                 key={a.name}
                 className="rounded-md bg-muted/30 px-2.5 py-1.5 text-[11px]"
               >
-                <p className="font-semibold">{a.name}</p>
+                <p className="flex items-center gap-1.5 font-semibold">
+                  <span className="rounded bg-amber-200 px-1 text-[8px] font-black tracking-wider text-amber-900">
+                    예시
+                  </span>
+                  {a.name}
+                </p>
                 <p className="text-[10px] text-muted-foreground">
                   {a.households.toLocaleString()}세대 · 평균{" "}
                   {a.avgPyeong}평 ·{" "}
