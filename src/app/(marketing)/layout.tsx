@@ -10,13 +10,15 @@ export default function MarketingLayout({
 }) {
   return (
     <div className="snap-container">
-      <div className="fixed top-0 left-0 right-0 z-50">
+      <div className="fixed top-0 left-0 right-0 z-50 print:hidden">
         <TopBanner />
         <Header />
       </div>
-      <main className="flex-1 pt-[108px]">{children}</main>
-      <Footer />
-      <FloatingCTA />
+      <main className="flex-1 pt-[108px] print:pt-0">{children}</main>
+      <div className="print:hidden">
+        <Footer />
+        <FloatingCTA />
+      </div>
     </div>
   );
 }
