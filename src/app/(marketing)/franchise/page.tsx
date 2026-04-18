@@ -464,6 +464,66 @@ export default function FranchisePage() {
         </div>
       </section>
 
+      {/* AI 상권분석 진입 카드 */}
+      <section className="py-20">
+        <div className="container-responsive max-w-5xl">
+          <SectionFadeIn>
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[oklch(0.32_0.18_290)] via-[oklch(0.36_0.20_290)] to-[oklch(0.28_0.18_290)] p-8 text-white shadow-xl sm:p-12">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(255,255,255,0.18),transparent_55%)]" />
+              <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[11px] font-bold tracking-[0.15em] backdrop-blur">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+                    NEW · AI TERRITORY ANALYSIS
+                  </div>
+                  <h2 className="mt-4 font-black leading-[1.1] tracking-[-0.02em] text-[28px] sm:text-[40px] lg:text-[48px]">
+                    내 동네는 두비전 가맹에
+                    <br />
+                    <span className="text-[oklch(0.92_0.08_60)]">
+                      얼마나 적합할까?
+                    </span>
+                  </h2>
+                  <p className="mt-4 max-w-[480px] text-[14px] leading-[1.7] text-white/85 sm:text-[16px]">
+                    후보 지점의 학교·학원·아파트·인구 데이터를 AI가 즉시 분석해{" "}
+                    <strong>사업성 등급(S~D)과 예상 월 순이익까지</strong>{" "}
+                    1분 안에 확인합니다. 본사 25년 직영 데이터 기반 검증 모델.
+                  </p>
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {[
+                      "학교·학생수",
+                      "경쟁 학원 수",
+                      "아파트 시세",
+                      "인구·소득",
+                      "예상 매출",
+                      "마케팅 전략",
+                    ].map((t) => (
+                      <span
+                        key={t}
+                        className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[11px] font-bold backdrop-blur"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/territory-analysis"
+                    className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-4 text-[15px] font-black text-[oklch(0.32_0.18_290)] shadow-lg transition-transform hover:translate-y-[-2px]"
+                  >
+                    AI 상권분석 시작
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                  <p className="text-center text-[10.5px] text-white/70">
+                    무료 · 1분 소요 · PDF 저장 가능
+                  </p>
+                </div>
+              </div>
+            </div>
+          </SectionFadeIn>
+        </div>
+      </section>
+
       {/* 본사 지원 */}
       <section className="bg-[oklch(0.97_0.005_290)] py-20">
         <div className="container-responsive">

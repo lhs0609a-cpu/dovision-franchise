@@ -14,8 +14,8 @@ const navItems = [
   { href: "/success", label: "성과 사례" },
   { href: "/franchise", label: "가맹 안내" },
   { href: "/simulator", label: "수익 시뮬레이터" },
+  { href: "/territory-analysis", label: "AI 상권분석", badge: "NEW" },
   { href: "/faq", label: "FAQ" },
-  { href: "/notice", label: "공지사항" },
 ];
 
 export default function Header() {
@@ -50,9 +50,14 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-md px-3.5 py-2 text-[14px] font-medium text-foreground/70 transition-colors hover:text-primary"
+              className="relative rounded-md px-3 py-2 text-[14px] font-medium text-foreground/70 transition-colors hover:text-primary"
             >
               {item.label}
+              {item.badge && (
+                <span className="ml-1 inline-flex items-center rounded bg-primary px-1.5 py-0.5 align-middle text-[9px] font-black tracking-wider text-primary-foreground">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           ))}
         </nav>
@@ -84,9 +89,14 @@ export default function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="rounded-md px-4 py-3 text-base font-medium transition-colors hover:bg-accent hover:text-primary"
+                    className="flex items-center gap-2 rounded-md px-4 py-3 text-base font-medium transition-colors hover:bg-accent hover:text-primary"
                   >
                     {item.label}
+                    {item.badge && (
+                      <span className="rounded bg-primary px-1.5 py-0.5 text-[9px] font-black tracking-wider text-primary-foreground">
+                        {item.badge}
+                      </span>
+                    )}
                   </Link>
                 ))}
                 <div className="mt-4 space-y-2 px-4">
