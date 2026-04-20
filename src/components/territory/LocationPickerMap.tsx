@@ -4,169 +4,233 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, Crosshair, MapPin } from "lucide-react";
 
 // ============================================================
-// 입지 선택 지도 (Google Maps JavaScript API)
+// 입지 선택 지도 (Kakao Maps JavaScript SDK)
 // ============================================================
-// API 키: NEXT_PUBLIC_GOOGLE_MAPS_API_KEY (HTTP referer 제한 필수)
-// 클릭 → 좌표 + Geocoding으로 한국어 주소 자동 반환
-// 외부 검색 trigger → Geocoding으로 좌표 이동 + 반경 원 렌더
+// 키: NEXT_PUBLIC_KAKAO_JS_KEY (Kakao Developers > 앱 > JavaScript 키)
+// Kakao Developers 콘솔에서 플랫폼 > Web 도메인 등록 필수
 // ============================================================
 
-const GMAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
-const GMAPS_SCRIPT_ID = "google-maps-js";
+const KAKAO_JS_KEY = process.env.NEXT_PUBLIC_KAKAO_JS_KEY || "";
+const KAKAO_SCRIPT_ID = "kakao-maps-sdk";
 // 서울 시청 기본 중심
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 };
-const DEFAULT_ZOOM = 12;
+const DEFAULT_LEVEL = 5; // Kakao는 level이 낮을수록 확대 (3~6 권장)
 
-// 최소 Google Maps 타입
-type LatLng = { lat: number; lng: number };
-type GMap = {
-  setCenter: (c: LatLng) => void;
-  setZoom: (z: number) => void;
-  panTo: (c: LatLng) => void;
-  addListener: (evt: string, fn: (e: { latLng: GLatLng }) => void) => void;
-  fitBounds: (b: unknown) => void;
+// ----------------------------------------------------------
+// Kakao Maps 최소 타입
+// ----------------------------------------------------------
+type KLatLng = {
+  getLat: () => number;
+  getLng: () => number;
 };
-type GLatLng = {
-  lat: () => number;
-  lng: () => number;
-  toJSON: () => LatLng;
+type KMap = {
+  setCenter: (latlng: KLatLng) => void;
+  setLevel: (level: number) => void;
+  panTo: (latlng: KLatLng) => void;
 };
-type GMarker = {
-  setPosition: (c: LatLng) => void;
-  setMap: (m: GMap | null) => void;
+type KMarker = {
+  setPosition: (latlng: KLatLng) => void;
+  setMap: (map: KMap | null) => void;
 };
-type GCircle = {
-  setCenter: (c: LatLng) => void;
-  setRadius: (r: number) => void;
-  setMap: (m: GMap | null) => void;
+type KCircle = {
+  setPosition: (latlng: KLatLng) => void;
+  setRadius: (radius: number) => void;
+  setMap: (map: KMap | null) => void;
 };
-type GGeocoderResult = {
-  formatted_address: string;
-  address_components: Array<{
-    long_name: string;
-    short_name: string;
-    types: string[];
-  }>;
-  geometry: { location: GLatLng };
+type KAddress = {
+  address_name: string;
+  region_1depth_name: string;
+  region_2depth_name: string;
+  region_3depth_name: string;
 };
-type GGeocoderStatus = "OK" | "ZERO_RESULTS" | "ERROR" | string;
-type GGeocoder = {
-  geocode: (
-    req: { location?: LatLng; address?: string; region?: string; language?: string },
-    cb: (results: GGeocoderResult[] | null, status: GGeocoderStatus) => void
+type KRoadAddress = {
+  address_name: string;
+  building_name?: string;
+} | null;
+type KCoord2AddrResult = {
+  address: KAddress;
+  road_address: KRoadAddress;
+};
+type KAddrSearchResult = {
+  address_name: string;
+  x: string; // lng
+  y: string; // lat
+  road_address: KRoadAddress;
+};
+type KStatus = "OK" | "ZERO_RESULT" | "ERROR";
+type KGeocoder = {
+  coord2Address: (
+    lng: number,
+    lat: number,
+    cb: (result: KCoord2AddrResult[], status: KStatus) => void
+  ) => void;
+  addressSearch: (
+    query: string,
+    cb: (result: KAddrSearchResult[], status: KStatus) => void
   ) => void;
 };
-type GoogleMaps = {
-  Map: new (el: HTMLElement, opts: Record<string, unknown>) => GMap;
-  Marker: new (opts: Record<string, unknown>) => GMarker;
-  Circle: new (opts: Record<string, unknown>) => GCircle;
-  Geocoder: new () => GGeocoder;
-  SymbolPath: { CIRCLE: number };
-  Animation: { DROP: number };
-  event: { addListenerOnce: (m: unknown, e: string, fn: () => void) => void };
+type KPlaceSearchResult = {
+  place_name: string;
+  address_name: string;
+  road_address_name: string;
+  x: string; // lng
+  y: string; // lat
+};
+type KPlaces = {
+  keywordSearch: (
+    query: string,
+    cb: (result: KPlaceSearchResult[], status: KStatus) => void
+  ) => void;
+};
+type KakaoMaps = {
+  LatLng: new (lat: number, lng: number) => KLatLng;
+  Map: new (el: HTMLElement, opts: { center: KLatLng; level: number }) => KMap;
+  Marker: new (opts: {
+    position: KLatLng;
+    map?: KMap;
+    title?: string;
+    image?: unknown;
+  }) => KMarker;
+  MarkerImage: new (
+    src: string,
+    size: unknown,
+    opts?: { offset?: unknown }
+  ) => unknown;
+  Size: new (w: number, h: number) => unknown;
+  Point: new (x: number, y: number) => unknown;
+  Circle: new (opts: {
+    center: KLatLng;
+    radius: number;
+    strokeWeight?: number;
+    strokeColor?: string;
+    strokeOpacity?: number;
+    strokeStyle?: string;
+    fillColor?: string;
+    fillOpacity?: number;
+    map?: KMap;
+  }) => KCircle;
+  event: {
+    addListener: (
+      target: unknown,
+      event: string,
+      handler: (e: { latLng: KLatLng }) => void
+    ) => void;
+  };
+  services: {
+    Geocoder: new () => KGeocoder;
+    Places: new () => KPlaces;
+    Status: { OK: "OK"; ZERO_RESULT: "ZERO_RESULT"; ERROR: "ERROR" };
+  };
+  load: (cb: () => void) => void;
 };
 
 declare global {
   interface Window {
-    google?: { maps: GoogleMaps };
-    __initDovisionGmap?: () => void;
+    kakao?: { maps: KakaoMaps };
   }
 }
 
-let gmapLoadPromise: Promise<GoogleMaps> | null = null;
+let kakaoLoadPromise: Promise<KakaoMaps> | null = null;
 
-function loadGoogleMaps(): Promise<GoogleMaps> {
+function loadKakaoMaps(): Promise<KakaoMaps> {
   if (typeof window === "undefined") return Promise.reject(new Error("SSR"));
-  if (window.google?.maps) return Promise.resolve(window.google.maps);
-  if (gmapLoadPromise) return gmapLoadPromise;
+  if (window.kakao?.maps?.LatLng) return Promise.resolve(window.kakao.maps);
+  if (kakaoLoadPromise) return kakaoLoadPromise;
 
-  gmapLoadPromise = new Promise<GoogleMaps>((resolve, reject) => {
-    if (!GMAPS_API_KEY) {
-      reject(new Error("NEXT_PUBLIC_GOOGLE_MAPS_API_KEY not set"));
+  kakaoLoadPromise = new Promise<KakaoMaps>((resolve, reject) => {
+    if (!KAKAO_JS_KEY) {
+      reject(new Error("NEXT_PUBLIC_KAKAO_JS_KEY not set"));
       return;
     }
-    const existing = document.getElementById(GMAPS_SCRIPT_ID);
-    if (existing) {
-      const check = () => {
-        if (window.google?.maps) resolve(window.google.maps);
-        else setTimeout(check, 80);
-      };
-      check();
-      return;
-    }
-    window.__initDovisionGmap = () => {
-      if (window.google?.maps) resolve(window.google.maps);
-      else reject(new Error("Google Maps failed to initialize"));
+    const done = () => {
+      const maps = window.kakao?.maps;
+      if (!maps) {
+        reject(new Error("Kakao Maps failed to initialize"));
+        return;
+      }
+      maps.load(() => resolve(maps));
     };
+    const existing = document.getElementById(KAKAO_SCRIPT_ID);
+    if (existing) {
+      if (window.kakao?.maps) done();
+      else existing.addEventListener("load", done, { once: true });
+      return;
+    }
     const script = document.createElement("script");
-    script.id = GMAPS_SCRIPT_ID;
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GMAPS_API_KEY}&language=ko&region=KR&libraries=places&callback=__initDovisionGmap`;
+    script.id = KAKAO_SCRIPT_ID;
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}&libraries=services&autoload=false`;
     script.async = true;
-    script.defer = true;
+    script.onload = done;
     script.onerror = () =>
-      reject(new Error("Failed to load Google Maps script"));
+      reject(new Error("Failed to load Kakao Maps script"));
     document.head.appendChild(script);
   });
-  return gmapLoadPromise;
+  return kakaoLoadPromise;
 }
 
 // ----------------------------------------------------------
-// 좌표 → 한국 주소 (Geocoder)
+// 좌표 → 한국 주소 (Kakao Geocoder)
 // ----------------------------------------------------------
 async function reverseGeocode(
-  gmaps: GoogleMaps,
+  kmaps: KakaoMaps,
   lat: number,
   lng: number
 ): Promise<string> {
   return new Promise((resolve) => {
-    const geo = new gmaps.Geocoder();
-    geo.geocode(
-      { location: { lat, lng }, language: "ko", region: "KR" },
-      (results, status) => {
-        if (status !== "OK" || !results || !results.length) {
-          resolve(`(${lat.toFixed(4)}, ${lng.toFixed(4)})`);
-          return;
-        }
-        // 한국 주소 우선: 도로명 주소 포함된 결과, 없으면 formatted_address
-        const best =
-          results.find((r) =>
-            r.address_components.some((c) => c.types.includes("premise"))
-          ) || results[0];
-        // "대한민국" 제거, 앞 4조각 추출
-        const cleaned = best.formatted_address
-          .replace(/^대한민국\s*/, "")
-          .replace(/\s*,\s*/g, " ")
-          .trim();
-        resolve(cleaned);
+    const geo = new kmaps.services.Geocoder();
+    geo.coord2Address(lng, lat, (result, status) => {
+      if (status !== "OK" || !result || !result.length) {
+        resolve(`(${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+        return;
       }
-    );
+      const r = result[0];
+      // 도로명 주소 우선, 없으면 지번 주소
+      const addr =
+        r.road_address?.address_name ||
+        r.address?.address_name ||
+        `(${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+      resolve(addr);
+    });
   });
 }
 
 // ----------------------------------------------------------
-// 주소 → 좌표 (Geocoder)
+// 주소/지역명 → 좌표 (주소 검색 실패 시 키워드 검색 폴백)
 // ----------------------------------------------------------
 async function forwardGeocode(
-  gmaps: GoogleMaps,
+  kmaps: KakaoMaps,
   query: string
 ): Promise<{ lat: number; lng: number; displayName: string } | null> {
+  // 1차: 정식 주소 검색
+  const addrResult = await new Promise<KAddrSearchResult[] | null>((resolve) => {
+    const geo = new kmaps.services.Geocoder();
+    geo.addressSearch(query, (result, status) => {
+      resolve(status === "OK" && result?.length ? result : null);
+    });
+  });
+  if (addrResult) {
+    const r = addrResult[0];
+    return {
+      lat: Number(r.y),
+      lng: Number(r.x),
+      displayName: r.road_address?.address_name || r.address_name,
+    };
+  }
+  // 2차 폴백: 키워드 검색 (지역명, 랜드마크 등)
   return new Promise((resolve) => {
-    const geo = new gmaps.Geocoder();
-    geo.geocode(
-      { address: query, language: "ko", region: "KR" },
-      (results, status) => {
-        if (status !== "OK" || !results || !results.length) {
-          resolve(null);
-          return;
-        }
-        const r = results[0];
-        resolve({
-          lat: r.geometry.location.lat(),
-          lng: r.geometry.location.lng(),
-          displayName: r.formatted_address.replace(/^대한민국\s*/, ""),
-        });
+    const places = new kmaps.services.Places();
+    places.keywordSearch(query, (result, status) => {
+      if (status !== "OK" || !result?.length) {
+        resolve(null);
+        return;
       }
-    );
+      const r = result[0];
+      resolve({
+        lat: Number(r.y),
+        lng: Number(r.x),
+        displayName: r.road_address_name || r.address_name || r.place_name,
+      });
+    });
   });
 }
 
@@ -188,10 +252,10 @@ export default function LocationPickerMap({
   searchTrigger,
 }: LocationPickerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<GMap | null>(null);
-  const markerRef = useRef<GMarker | null>(null);
-  const circleRef = useRef<GCircle | null>(null);
-  const gmapsRef = useRef<GoogleMaps | null>(null);
+  const mapRef = useRef<KMap | null>(null);
+  const markerRef = useRef<KMarker | null>(null);
+  const circleRef = useRef<KCircle | null>(null);
+  const kmapsRef = useRef<KakaoMaps | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading"
   );
@@ -202,38 +266,23 @@ export default function LocationPickerMap({
   // 지도 초기화
   useEffect(() => {
     let cancelled = false;
-    loadGoogleMaps()
-      .then((gmaps) => {
+    loadKakaoMaps()
+      .then((kmaps) => {
         if (cancelled || !containerRef.current) return;
-        gmapsRef.current = gmaps;
+        kmapsRef.current = kmaps;
 
-        const map = new gmaps.Map(containerRef.current, {
-          center: DEFAULT_CENTER,
-          zoom: DEFAULT_ZOOM,
-          mapTypeControl: false,
-          streetViewControl: false,
-          fullscreenControl: false,
-          clickableIcons: false,
-          gestureHandling: "greedy",
-          styles: [
-            {
-              featureType: "poi.business",
-              stylers: [{ visibility: "off" }],
-            },
-            {
-              featureType: "transit",
-              stylers: [{ visibility: "simplified" }],
-            },
-          ],
+        const map = new kmaps.Map(containerRef.current, {
+          center: new kmaps.LatLng(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng),
+          level: DEFAULT_LEVEL,
         });
 
-        map.addListener("click", async (e: { latLng: GLatLng }) => {
-          const lat = e.latLng.lat();
-          const lng = e.latLng.lng();
+        kmaps.event.addListener(map, "click", async (e: { latLng: KLatLng }) => {
+          const lat = e.latLng.getLat();
+          const lng = e.latLng.getLng();
           placeMarker(lat, lng);
           setIsResolving(true);
           setHint("주소를 가져오는 중...");
-          const addr = await reverseGeocode(gmaps, lat, lng);
+          const addr = await reverseGeocode(kmaps, lat, lng);
           setIsResolving(false);
           setHint(addr ? `선택된 위치: ${addr}` : "주소를 찾을 수 없습니다");
           onSelect({ lat, lng, address: addr });
@@ -244,9 +293,9 @@ export default function LocationPickerMap({
       })
       .catch((err) => {
         setErrorMsg(
-          err?.message?.includes("API_KEY")
-            ? "Google Maps API 키가 설정되지 않았습니다."
-            : "지도를 불러올 수 없습니다. API 키의 HTTP referer 제한과 결제 설정을 확인해주세요."
+          err?.message?.includes("NEXT_PUBLIC_KAKAO_JS_KEY")
+            ? "Kakao Maps JavaScript 키가 설정되지 않았습니다."
+            : "지도를 불러올 수 없습니다. Kakao Developers 콘솔에서 JavaScript 키와 사이트 도메인 등록을 확인해주세요."
         );
         setStatus("error");
       });
@@ -265,18 +314,19 @@ export default function LocationPickerMap({
   // 외부 검색 트리거
   useEffect(() => {
     if (!searchTrigger || !searchTrigger.query.trim()) return;
-    const gmaps = gmapsRef.current;
+    const kmaps = kmapsRef.current;
     const map = mapRef.current;
-    if (!gmaps || !map) return;
+    if (!kmaps || !map) return;
     let cancelled = false;
     setIsResolving(true);
     setHint(`"${searchTrigger.query}" 검색 중...`);
-    forwardGeocode(gmaps, searchTrigger.query).then((res) => {
+    forwardGeocode(kmaps, searchTrigger.query).then((res) => {
       if (cancelled) return;
       setIsResolving(false);
       if (res) {
-        map.panTo({ lat: res.lat, lng: res.lng });
-        map.setZoom(15);
+        const latlng = new kmaps.LatLng(res.lat, res.lng);
+        map.panTo(latlng);
+        map.setLevel(4);
         placeMarker(res.lat, res.lng);
         setHint(`검색 결과: ${res.displayName}`);
         onSelect({
@@ -304,43 +354,35 @@ export default function LocationPickerMap({
   }, [radiusKm]);
 
   function placeMarker(lat: number, lng: number) {
-    const gmaps = gmapsRef.current;
+    const kmaps = kmapsRef.current;
     const map = mapRef.current;
-    if (!gmaps || !map) return;
+    if (!kmaps || !map) return;
+    const latlng = new kmaps.LatLng(lat, lng);
 
     if (markerRef.current) {
-      markerRef.current.setPosition({ lat, lng });
+      markerRef.current.setPosition(latlng);
     } else {
-      markerRef.current = new gmaps.Marker({
-        position: { lat, lng },
+      markerRef.current = new kmaps.Marker({
+        position: latlng,
         map,
         title: "후보 지점",
-        animation: gmaps.Animation.DROP,
-        icon: {
-          path: gmaps.SymbolPath.CIRCLE,
-          scale: 10,
-          fillColor: "#7c3aed",
-          fillOpacity: 1,
-          strokeColor: "#ffffff",
-          strokeWeight: 3,
-        },
       });
     }
 
     if (circleRef.current) {
-      circleRef.current.setCenter({ lat, lng });
+      circleRef.current.setPosition(latlng);
       circleRef.current.setRadius(radiusKm * 1000);
     } else {
-      circleRef.current = new gmaps.Circle({
-        center: { lat, lng },
+      circleRef.current = new kmaps.Circle({
+        center: latlng,
         radius: radiusKm * 1000,
-        map,
+        strokeWeight: 2,
         strokeColor: "#7c3aed",
         strokeOpacity: 0.65,
-        strokeWeight: 2,
+        strokeStyle: "solid",
         fillColor: "#7c3aed",
         fillOpacity: 0.08,
-        clickable: false,
+        map,
       });
     }
   }
@@ -370,7 +412,7 @@ export default function LocationPickerMap({
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
               <p className="text-[12px] font-semibold">
-                Google Maps를 불러오는 중...
+                Kakao Maps를 불러오는 중...
               </p>
             </div>
           </div>
@@ -390,8 +432,7 @@ export default function LocationPickerMap({
       </div>
 
       <p className="mt-2 text-[10.5px] text-muted-foreground">
-        지도: Google Maps · 장소 검색: Kakao 로컬 API · 주소 검색: Google
-        Geocoding
+        지도 및 장소 검색: Kakao Maps · 주소 검색: Kakao Geocoding
       </p>
     </div>
   );

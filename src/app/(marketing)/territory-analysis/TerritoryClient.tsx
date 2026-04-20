@@ -211,11 +211,11 @@ export default function TerritoryClient() {
             </div>
             <div className="flex-1 text-[12px] leading-[1.65] text-emerald-900 sm:text-[13px]">
               <p className="font-bold text-emerald-900">
-                ✓ 실시간 데이터 연동 — Google Maps + Kakao 로컬 API
+                ✓ 실시간 데이터 연동 — Kakao Maps + Kakao 로컬 API
               </p>
               <p className="mt-1">
-                지도는 <strong>Google Maps</strong>, 학교·학원은{" "}
-                <strong>카카오 로컬 API(실제 상호명)</strong>로 조회됩니다. 각
+                지도·주소 검색 및 학교·학원 데이터 모두{" "}
+                <strong>카카오 API(실제 상호명)</strong>로 조회됩니다. 각
                 장소명 옆의 &ldquo;카카오↗&rdquo; 링크로 원본 상세를 확인할 수
                 있습니다.
                 <br />
