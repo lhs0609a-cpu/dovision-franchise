@@ -2,19 +2,23 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const isAdmin = request.nextUrl.pathname.startsWith("/admin");
+  const path = request.nextUrl.pathname;
+  const isAdmin = path.startsWith("/admin");
+  const isPortal =
+    path.startsWith("/portal") && !path.startsWith("/portal/login");
 
-  // Check for session token (next-auth sets this cookie)
-  const token = request.cookies.get("authjs.session-token") ||
+  const token =
+    request.cookies.get("authjs.session-token") ||
     request.cookies.get("__Secure-authjs.session-token");
 
-  if (isAdmin && !token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  if ((isAdmin || isPortal) && !token) {
+    const loginPath = isPortal ? "/portal/login" : "/login";
+    return NextResponse.redirect(new URL(loginPath, request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/portal/:path*"],
 };

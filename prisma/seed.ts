@@ -1,5 +1,6 @@
 import { PrismaClient } from "../src/generated/prisma/client";
 import bcrypt from "bcryptjs";
+import { CHECKLIST_ITEMS } from "../src/lib/checklist";
 
 const prisma = new PrismaClient();
 
@@ -58,6 +59,28 @@ async function main() {
     await prisma.notice.create({ data: n });
   }
   console.log(`${notices.length} notices created`);
+
+  // 체크리스트 마스터 템플릿 (upsert — 멱등)
+  for (const item of CHECKLIST_ITEMS) {
+    await prisma.checklistTemplate.upsert({
+      where: { phase_order: { phase: item.phase, order: item.order } },
+      update: {
+        title: item.title,
+        description: item.description ?? null,
+        isLegalRequired: item.isLegalRequired ?? false,
+        defaultOffsetDays: item.defaultOffsetDays ?? null,
+      },
+      create: {
+        phase: item.phase,
+        order: item.order,
+        title: item.title,
+        description: item.description ?? null,
+        isLegalRequired: item.isLegalRequired ?? false,
+        defaultOffsetDays: item.defaultOffsetDays ?? null,
+      },
+    });
+  }
+  console.log(`${CHECKLIST_ITEMS.length} checklist templates upserted`);
 
   console.log("Seed completed!");
 }

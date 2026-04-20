@@ -15,9 +15,12 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { updateInquiryStatus, updateInquiryNote } from "@/actions/inquiry";
+import { createFranchiseeFromInquiry } from "@/app/admin/franchisees/actions";
 import { INQUIRY_STATUS_LABELS } from "@/types";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import { Building2 } from "lucide-react";
 
 interface InquiryDetail {
   id: string;
@@ -176,6 +179,47 @@ export default function InquiryDetailPage() {
               </Button>
             </CardContent>
           </Card>
+
+          {inquiry.status === "CONTRACTED" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Building2 className="h-4 w-4 text-primary" />
+                  가맹점주 포털 계정 생성
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-3 text-[11.5px] text-muted-foreground">
+                  계약 체결 완료 후 가맹점주 포털 로그인 계정을 생성하세요.
+                  생성 시 개업 체크리스트가 자동 연결됩니다.
+                </p>
+                <form action={createFranchiseeFromInquiry} className="space-y-2">
+                  <input type="hidden" name="inquiryId" value={inquiry.id} />
+                  <Input
+                    name="email"
+                    type="email"
+                    placeholder="가맹점주 로그인 이메일"
+                    required
+                  />
+                  <Input
+                    name="password"
+                    type="password"
+                    placeholder="임시 비밀번호 (8자 이상)"
+                    minLength={8}
+                    required
+                  />
+                  <Input
+                    name="centerName"
+                    placeholder="센터명 (예: 두비전 분당정자점)"
+                  />
+                  <Input name="targetOpenDate" type="date" />
+                  <Button type="submit" className="w-full">
+                    포털 계정 생성
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

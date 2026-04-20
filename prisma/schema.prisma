@@ -21,6 +21,89 @@ model Inquiry {
   privacyAgreed Boolean       @default(true)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+  franchisee    Franchisee?
+}
+
+// ============================================================
+// 가맹점 개업 여정 (Franchisee Onboarding)
+// ============================================================
+
+model Franchisee {
+  id                        String               @id @default(cuid())
+  // 로그인
+  email                     String               @unique
+  password                  String
+  // 기본 정보
+  name                      String
+  phone                     String
+  centerName                String?              // 개업 센터명 (미정 시 null)
+  region                    String               // 예: 경기 성남시 분당구
+  address                   String?              // 확정된 임대차 주소
+  // 연결: 문의 → 계약 전환 시
+  inquiryId                 String?              @unique
+  inquiry                   Inquiry?             @relation(fields: [inquiryId], references: [id])
+  // 타임라인
+  targetOpenDate            DateTime?            // 개업 희망일 (D-Day 기준점)
+  contractSignedAt          DateTime?            // 가맹계약 체결일
+  infoDisclosureReceivedAt  DateTime?            // 정보공개서 수령일 (법정 14일 숙고기간 기산)
+  openedAt                  DateTime?            // 실제 개업일
+  // 현재 단계 (캐시)
+  currentPhase              Int                  @default(0)
+  status                    FranchiseeStatus     @default(ONBOARDING)
+  // 메타
+  createdAt                 DateTime             @default(now())
+  updatedAt                 DateTime             @updatedAt
+  progress                  ChecklistProgress[]
+  documents                 FranchiseeDocument[]
+}
+
+enum FranchiseeStatus {
+  ONBOARDING   // 개업 준비 중
+  OPERATING    // 운영 중
+  SUSPENDED    // 휴업
+  TERMINATED   // 해지
+}
+
+// 체크리스트 마스터 템플릿 (seed로 생성)
+model ChecklistTemplate {
+  id                 String              @id @default(cuid())
+  phase              Int                 // 0 ~ 12
+  order              Int                 // phase 내 순서
+  title              String
+  description        String?             // 세부 설명·주의사항
+  isLegalRequired    Boolean             @default(false) // 법정 필수 항목 여부
+  defaultOffsetDays  Int?                // D-Day 대비 권장 시점 (음수: 개업 전, 양수: 개업 후)
+  progress           ChecklistProgress[]
+
+  @@unique([phase, order])
+}
+
+// 가맹점주별 체크 진행 상태
+model ChecklistProgress {
+  id                String             @id @default(cuid())
+  franchiseeId      String
+  franchisee        Franchisee         @relation(fields: [franchiseeId], references: [id], onDelete: Cascade)
+  templateId        String
+  template          ChecklistTemplate  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  isChecked         Boolean            @default(false)
+  checkedAt         DateTime?
+  adminVerifiedAt   DateTime?          // 본사가 확인·승인한 시점
+  note              String?            // 가맹점주 또는 본사 메모
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@unique([franchiseeId, templateId])
+}
+
+// 가맹점주가 본사에 제출한 문서 (사업자등록증, 임대차계약서 등)
+model FranchiseeDocument {
+  id            String      @id @default(cuid())
+  franchiseeId  String
+  franchisee    Franchisee  @relation(fields: [franchiseeId], references: [id], onDelete: Cascade)
+  category      String      // 예: "사업자등록증", "임대차계약서"
+  fileName      String
+  fileUrl       String      // 저장 경로 (S3 or 로컬)
+  uploadedAt    DateTime    @default(now())
 }
 
 enum InquiryStatus {
