@@ -55,6 +55,7 @@ model Franchisee {
   updatedAt                 DateTime             @updatedAt
   progress                  ChecklistProgress[]
   documents                 FranchiseeDocument[]
+  contractSignatures        ContractSignature[]
 }
 
 enum FranchiseeStatus {
@@ -104,6 +105,42 @@ model FranchiseeDocument {
   fileName      String
   fileUrl       String      // 저장 경로 (S3 or 로컬)
   uploadedAt    DateTime    @default(now())
+}
+
+// ============================================================
+// 가맹계약서 템플릿 (본사 관리)
+// ============================================================
+
+model ContractTemplate {
+  id             String   @id @default(cuid())
+  version        String   @unique              // "v2026.04.21"
+  title          String                        // "두비전 가맹계약서"
+  hwpFileUrl     String                        // Vercel Blob URL
+  hwpFileName    String                        // 원본 파일명
+  hwpFileSize    Int                           // bytes
+  isActive       Boolean  @default(false)      // 현재 사용 중인 버전 (단일)
+  effectiveFrom  DateTime?                     // 적용 시작일
+  note           String?                       // 개정 사유 메모
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  signatures     ContractSignature[]
+}
+
+// 가맹점주별 계약서 열람·동의 기록
+model ContractSignature {
+  id              String            @id @default(cuid())
+  franchiseeId    String
+  franchisee      Franchisee        @relation(fields: [franchiseeId], references: [id], onDelete: Cascade)
+  templateId      String
+  template        ContractTemplate  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  viewedAt        DateTime?                  // 최초 열람 시각
+  downloadedAt    DateTime?                  // HWP 다운로드 시각
+  agreedAt        DateTime?                  // "읽고 동의" 체크 시각
+  agreementIp     String?                    // 동의 당시 IP (감사 로그)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([franchiseeId, templateId])
 }
 
 enum InquiryStatus {

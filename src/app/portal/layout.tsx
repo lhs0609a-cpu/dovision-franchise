@@ -19,12 +19,32 @@ export default async function PortalLayout({
     <div className="min-h-screen bg-muted/30">
       <header className="border-b bg-white">
         <div className="container-responsive max-w-6xl flex h-14 items-center justify-between">
-          <Link href="/portal" className="flex items-center gap-2">
-            <span className="text-[15px] font-bold text-primary">DOVISION</span>
-            <span className="text-[12px] text-muted-foreground">
-              가맹점주 포털
-            </span>
-          </Link>
+          <div className="flex items-center gap-5">
+            <Link href="/portal" className="flex items-center gap-2">
+              <span className="text-[15px] font-bold text-primary">
+                DOVISION
+              </span>
+              <span className="text-[12px] text-muted-foreground">
+                가맹점주 포털
+              </span>
+            </Link>
+            {session && session.user.userType === "franchisee" && (
+              <nav className="flex items-center gap-4 text-[12.5px]">
+                <Link
+                  href="/portal"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  체크리스트
+                </Link>
+                <Link
+                  href="/portal/contract"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  가맹계약서
+                </Link>
+              </nav>
+            )}
+          </div>
           {session && (
             <form
               action={async () => {

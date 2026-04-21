@@ -13,6 +13,7 @@ import {
   LogOut,
   ExternalLink,
   Building2,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "대시보드" },
   { href: "/admin/inquiries", icon: MessageSquare, label: "문의 관리" },
   { href: "/admin/franchisees", icon: Building2, label: "가맹점 관리" },
+  { href: "/admin/contracts", icon: FileText, label: "가맹계약서" },
   { href: "/admin/testimonials", icon: Star, label: "성과사례" },
   { href: "/admin/faq", icon: HelpCircle, label: "FAQ" },
   { href: "/admin/notices", icon: Bell, label: "공지사항" },
