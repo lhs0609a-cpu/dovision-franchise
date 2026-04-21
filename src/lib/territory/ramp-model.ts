@@ -86,14 +86,14 @@ const MARKETING_BY_SCENARIO: Record<Scenario, number> = {
 const INITIAL_INVESTMENT = 10000;
 
 /**
- * 세대별 재등록 확률 — 한번 연장한 회원일수록 유지율 상승(성과 체감 + 몰입)
- *  - 신규 → 1차 재등록 (첫 6개월 후)  : 0.65
- *  - 1차 → 2차 재등록 (12개월차)       : 0.75
- *  - 2차 → 3차 재등록 (18개월차)       : 0.80
- *  - 3차 이상 장기 회원                : 0.85
- * 직영 3개 센터 평균. 장기 수강생 비중 반영.
+ * 세대별 재등록 확률 — 보수적 기준 (가맹주 의사결정 시 과장 방지)
+ *  - 신규 → 1차 재등록 (첫 6개월 후)  : 0.40
+ *  - 1차 → 2차 재등록 (12개월차)       : 0.40
+ *  - 2차 → 3차 재등록 (18개월차)       : 0.40
+ *  - 3차 이상 장기 회원                : 0.40
+ * 본사 협의 기준 (2026-04). 실제 가맹점 실적 누적 후 재보정 예정.
  */
-const RENEWAL_RATE_BY_GENERATION: readonly number[] = [0.65, 0.75, 0.80, 0.85];
+const RENEWAL_RATE_BY_GENERATION: readonly number[] = [0.40, 0.40, 0.40, 0.40];
 
 function renewalRateForGen(gen: number): number {
   return (
