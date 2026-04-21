@@ -41,6 +41,7 @@ import type {
 } from "@/lib/territory/types";
 import LocationPickerMap from "@/components/territory/LocationPickerMap";
 import ResultMap from "@/components/territory/ResultMap";
+import PathToProfitSection from "@/components/territory/PathToProfitSection";
 
 // ============================================================
 // 두비전 AI 상권분석 도구
@@ -458,8 +459,8 @@ function AnalysisResult({
       {/* ======== 6. AI 분석 리포트 ======== */}
       <AIReportSection analysis={analysis} />
 
-      {/* ======== 7. 예상 수익 시뮬레이션 ======== */}
-      <RevenueSection analysis={analysis} />
+      {/* ======== 7. Path to Profit — 24개월 수익 프로젝션 ======== */}
+      <PathToProfitSection demand={analysis.demand} />
 
       {/* ======== 8. 다음 단계 CTA ======== */}
       <CTASection analysis={analysis} />
@@ -1344,136 +1345,9 @@ function ReportCard({
 }
 
 // ============================================================
-// 7. 예상 수익 시뮬레이션
+// 7. 수익 프로젝션은 PathToProfitSection 컴포넌트로 이관됨
+//    (이전 steady-state RevenueSection은 현실과 괴리가 커서 제거)
 // ============================================================
-
-function RevenueSection({ analysis }: { analysis: TerritoryAnalysis }) {
-  const { revenue, demand } = analysis;
-  const stdSignups = demand.standardSignupsPerMonth;
-
-  return (
-    <section className="mb-10">
-      <SectionHeader
-        icon={TrendingUp}
-        eyebrow="REVENUE PROJECTION"
-        title="예상 수익 시뮬레이션"
-        subtitle={`표준 시나리오 (월 신규등록 ${stdSignups}명) 기준`}
-      />
-
-      <div className="mt-5 grid gap-4 lg:grid-cols-4">
-        <BigStat
-          label="월 매출"
-          value={revenue.monthlyRevenue.toLocaleString()}
-          unit="만원"
-        />
-        <BigStat
-          label="월 고정비"
-          value={revenue.monthlyFixedCost.toLocaleString()}
-          unit="만원"
-        />
-        <BigStat
-          label="본사 공급원가 (22.5%)"
-          value={revenue.monthlyCogs.toLocaleString()}
-          unit="만원"
-        />
-        <BigStat
-          label="월 순이익"
-          value={revenue.monthlyProfit.toLocaleString()}
-          unit="만원"
-          tone={revenue.monthlyProfit > 0 ? "success" : "danger"}
-        />
-      </div>
-
-      {/* 12개월 + BEP */}
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border/60 bg-white p-5">
-          <p className="text-[11px] font-bold tracking-[0.2em] text-primary">
-            12-MONTH PROJECTION
-          </p>
-          <p className="mt-2 text-[40px] font-black leading-none text-primary">
-            {revenue.yearlyProfit > 0 ? "+" : ""}
-            {revenue.yearlyProfit.toLocaleString()}
-            <span className="ml-1 text-[14px]">만원</span>
-          </p>
-          <p className="mt-1 text-[12px] text-muted-foreground">
-            월 표준 시나리오 12개월 누적 순이익 (1억원 초기투자 회수 기준)
-          </p>
-          <div className="mt-3 rounded-lg bg-muted/30 p-2.5 text-[11px]">
-            예상 회수 시점:{" "}
-            <strong className="text-primary">
-              {revenue.monthlyProfit > 0
-                ? `${Math.ceil(10000 / revenue.monthlyProfit)}개월`
-                : "BEP 미달"}
-            </strong>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-border/60 bg-white p-5">
-          <p className="text-[11px] font-bold tracking-[0.2em] text-primary">
-            BEP · 손익분기점
-          </p>
-          <p className="mt-2 text-[40px] font-black leading-none text-primary">
-            {revenue.bepSignups}
-            <span className="ml-1 text-[14px]">명/월</span>
-          </p>
-          <p className="mt-1 text-[12px] text-muted-foreground">
-            본사 공급원가 22.5% 차감 후 고정비 회수 가능 신규등록 수
-          </p>
-          <div className="mt-3 rounded-lg bg-primary/5 p-2.5 text-[11px]">
-            본 입지 표준 시나리오{" "}
-            <strong className="text-primary">{stdSignups}명</strong> →{" "}
-            {stdSignups >= revenue.bepSignups ? (
-              <span className="font-bold text-emerald-600">
-                BEP +{stdSignups - revenue.bepSignups}명 초과 달성
-              </span>
-            ) : (
-              <span className="font-bold text-rose-600">
-                BEP까지 {revenue.bepSignups - stdSignups}명 부족
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-3 rounded-xl border-l-4 border-primary bg-primary/5 p-4 text-[12px] leading-[1.7]">
-        <strong className="text-primary">※ 본사 공급원가 22.5% 구조</strong> —
-        매출의 77.5%가 가맹점주에게 남는 구조로, 동종 교육 프랜차이즈 대비
-        가맹점주 마진이 강합니다. 공급원가 = 로얄티 10% + 앱교재비 12.5%.
-      </div>
-    </section>
-  );
-}
-
-function BigStat({
-  label,
-  value,
-  unit,
-  tone = "default",
-}: {
-  label: string;
-  value: string | number;
-  unit: string;
-  tone?: "default" | "success" | "danger";
-}) {
-  const numColor =
-    tone === "success"
-      ? "text-emerald-600"
-      : tone === "danger"
-        ? "text-rose-600"
-        : "text-foreground";
-  return (
-    <div className="rounded-2xl border border-border/60 bg-white p-5 shadow-sm">
-      <p className="text-[11px] font-semibold text-muted-foreground">{label}</p>
-      <p className={`mt-2 text-[26px] font-black leading-none ${numColor}`}>
-        {tone === "success" && Number(value) > 0 ? "+" : ""}
-        {value}
-        <span className="ml-1 text-[12px] font-bold text-foreground/60">
-          {unit}
-        </span>
-      </p>
-    </div>
-  );
-}
 
 // ============================================================
 // 8. CTA
