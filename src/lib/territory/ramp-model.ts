@@ -85,8 +85,22 @@ const MARKETING_BY_SCENARIO: Record<Scenario, number> = {
 /** 초기 투자금 (만원) — 가맹비·인테리어·교육비·보증금 합산 약 1억 */
 const INITIAL_INVESTMENT = 10000;
 
-/** 6개월 수강 후 재등록 확률 (직영 평균) */
-const RENEWAL_RATE_6M = 0.65;
+/**
+ * 세대별 재등록 확률 — 한번 연장한 회원일수록 유지율 상승(성과 체감 + 몰입)
+ *  - 신규 → 1차 재등록 (첫 6개월 후)  : 0.65
+ *  - 1차 → 2차 재등록 (12개월차)       : 0.75
+ *  - 2차 → 3차 재등록 (18개월차)       : 0.80
+ *  - 3차 이상 장기 회원                : 0.85
+ * 직영 3개 센터 평균. 장기 수강생 비중 반영.
+ */
+const RENEWAL_RATE_BY_GENERATION: readonly number[] = [0.65, 0.75, 0.80, 0.85];
+
+function renewalRateForGen(gen: number): number {
+  return (
+    RENEWAL_RATE_BY_GENERATION[gen] ??
+    RENEWAL_RATE_BY_GENERATION[RENEWAL_RATE_BY_GENERATION.length - 1]
+  );
+}
 
 // ============================================================
 // 램프 곡선 — 월별 신규 등록 수 (steady state에 수렴)
@@ -122,33 +136,46 @@ export function simulatePath(
     marketingBudgetOverride ?? MARKETING_BY_SCENARIO[scenario];
 
   const monthly: MonthlyProjection[] = [];
-  // enrollments[m] = 해당 월에 (신규+재등록) 결제 건수. Index 0 = month 1.
-  const enrollments: number[] = [];
+  // enrollmentsByGen[m-1] = { gen: count } — 해당 월 등록 건을 세대별로 분해
+  //   gen 0 = 신규 첫 결제, gen 1 = 1차 재등록, gen 2 = 2차 재등록, ...
+  const enrollmentsByGen: Record<number, number>[] = [];
   let cumulativeProfit = 0;
 
   for (let m = 1; m <= monthCount; m++) {
-    // 1) 신규 등록 (신규 고객의 첫 결제)
-    const newSignups = newSignupsAt(m, steadySignups, marketingBudget);
+    const thisMonth: Record<number, number> = {};
 
-    // 2) 재등록 — 6개월 전 등록 건 × retention
+    // 1) 신규 등록 (gen 0)
+    const newSignups = newSignupsAt(m, steadySignups, marketingBudget);
+    thisMonth[0] = newSignups;
+
+    // 2) 재등록 — 6개월 전 등록 각 세대별로 해당 세대 재등록률 적용
     let renewals = 0;
     if (m > ENROLLMENT_MONTHS) {
-      const origEnrollment = enrollments[m - ENROLLMENT_MONTHS - 1] ?? 0;
-      renewals = origEnrollment * RENEWAL_RATE_6M;
+      const prev = enrollmentsByGen[m - ENROLLMENT_MONTHS - 1] ?? {};
+      for (const [genStr, count] of Object.entries(prev)) {
+        const gen = Number(genStr);
+        const rate = renewalRateForGen(gen);
+        const renewed = count * rate;
+        thisMonth[gen + 1] = (thisMonth[gen + 1] ?? 0) + renewed;
+        renewals += renewed;
+      }
     }
 
     const totalEnrollments = newSignups + renewals;
-    enrollments.push(totalEnrollments);
+    enrollmentsByGen.push(thisMonth);
 
-    // 3) 활성 회원 = 선불 유효기간(과거 6개월) 내 등록건의 총합
-    //    단, 각 등록건은 6개월간 1명으로 카운트
+    // 3) 활성 회원 = 과거 6개월 내 등록건의 총합 (세대 무관)
     let activeMembers = 0;
     for (
       let idx = Math.max(0, m - ENROLLMENT_MONTHS);
       idx < m;
       idx++
     ) {
-      activeMembers += enrollments[idx];
+      const monthEnrollments = enrollmentsByGen[idx];
+      if (!monthEnrollments) continue;
+      for (const count of Object.values(monthEnrollments)) {
+        activeMembers += count;
+      }
     }
 
     // 4) 현금 수입 (일시불)
@@ -264,5 +291,5 @@ export const RAMP_MODEL_CONSTANTS = {
   BASELINE_FIXED_COST,
   MARKETING_BY_SCENARIO,
   INITIAL_INVESTMENT,
-  RENEWAL_RATE_6M,
+  RENEWAL_RATE_BY_GENERATION,
 } as const;
