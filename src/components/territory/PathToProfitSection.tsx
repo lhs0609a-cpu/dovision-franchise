@@ -108,8 +108,8 @@ export default function PathToProfitSection({ demand }: Props) {
             수익 실현 경로 — 24개월 프로젝션
           </h2>
           <p className="mt-1 text-[12px] text-muted-foreground">
-            직영 3개 센터(강남·반포·위례) 실적 기반 S-curve 램프업 + 코호트
-            유지율 모델
+            직영 3개 센터(강남·반포·위례) 실적 기반 · 6개월 선불 480만원
+            일시불 기준 현금흐름 모델
           </p>
         </div>
       </div>
@@ -179,9 +179,10 @@ export default function PathToProfitSection({ demand }: Props) {
       <div className="mt-5 rounded-2xl border border-border/60 bg-white p-5 shadow-sm">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h3 className="text-[14px] font-bold">24개월 누적 순이익</h3>
+            <h3 className="text-[14px] font-bold">24개월 누적 현금흐름</h3>
             <p className="mt-0.5 text-[11px] text-muted-foreground">
-              보수 · 표준 · 공격 3시나리오 동시 제시 · 1억원 회수선 강조
+              등록 시점 480만원 일시불 수납 · 보수/표준/공격 3시나리오 · 1억
+              회수선 강조
             </p>
           </div>
           <LegendPill />
@@ -389,16 +390,24 @@ export default function PathToProfitSection({ demand }: Props) {
         {assumptionsOpen && (
           <div className="space-y-3 border-t border-border/60 p-5 text-[11.5px] leading-[1.65]">
             <AssumptionRow
-              title="램프업 S-curve"
+              title="현금 기반(Cash-basis) 수입 모델"
+              body="두비전은 6개월 선불 480만원 일시불 수납. 따라서 매출을 월 80만원 분할 인식(accrual)하지 않고, 등록 발생 월에 480만원을 전액 현금 수입으로 처리. 가맹점주 실제 통장 잔액과 일치."
+            />
+            <AssumptionRow
+              title="램프업 S-curve (신규 등록)"
               body="개업 첫 달은 홍보·인지도 구축 기간. 신규 등록은 월 차가 지날수록 steady state에 수렴 (1 - e^(-k·m)). 마케팅 예산이 클수록 k(램프 속도)와 상한이 증가."
             />
             <AssumptionRow
-              title="코호트 유지율 (지수 감쇠)"
-              body="직영 평균 half-life 12개월 → R(1)≈94%, R(3)≈84%, R(6)≈71%, R(12)=50%, R(18)≈35%, R(24)≈25%. 등록월별 코호트를 개별 추적해 월말 활성 회원 산출."
+              title="6개월 재등록 (Renewal) 모델"
+              body="등록 후 6개월 경과 시점에 직영 평균 65% 확률로 재등록(= 다시 480만원 일시불). 7개월차부터 기존 고객 재결제 현금이 추가 유입되는 구조. 재등록된 회원은 또 6개월 후 같은 확률로 재결제."
             />
             <AssumptionRow
-              title="수익 공식"
-              body="매출 = 활성회원 × 80만원/월 | 본사 공급원가 = 매출 × 22.5% (로열티 10% + 앱교재비 12.5%) | 월 고정비 = 1,300만원(임대 400 + 인건비 700 + 기타 200) + 마케팅 예산 | 순이익 = 매출 − 공급원가 − 고정비 − 마케팅"
+              title="월 수입 공식"
+              body="월 매출(현금) = 해당 월 등록 결제 건수 × 480만원 = (신규 등록 + 재등록) × 480 | 본사 공급원가 = 매출 × 22.5% (로열티 10% + 앱교재비 12.5%) | 월 고정비 = 1,300만원(임대 400 + 인건비 700 + 기타 200) + 마케팅 예산 | 순이익 = 매출 − 공급원가 − 고정비 − 마케팅"
+            />
+            <AssumptionRow
+              title="활성 회원 정의"
+              body="월말 기준 '선불 유효기간(등록 후 6개월) 내'에 있는 회원 수. 등록 7개월째에 재등록하지 않으면 비활성으로 분류. 마케팅·운영 전략 수립 시 이 회원 수를 기준으로 수업 편성."
             />
             <AssumptionRow
               title="초기 투자금"
@@ -406,7 +415,7 @@ export default function PathToProfitSection({ demand }: Props) {
             />
             <AssumptionRow
               title="법적 고지 (가맹사업법 §9)"
-              body="본 수치는 직영 3개점 실적 기반 추정치이며 개별 가맹점 결과는 입지·운영자 역량·시장 상황에 따라 상이할 수 있습니다. 보수 시나리오도 함께 확인하시기 바랍니다."
+              body="본 수치는 직영 3개점 실적 기반 추정치이며 개별 가맹점 결과는 입지·운영자 역량·시장 상황에 따라 상이할 수 있습니다. 재등록률·유지율은 변동 가능 — 보수 시나리오도 함께 확인하시기 바랍니다."
               warning
             />
           </div>

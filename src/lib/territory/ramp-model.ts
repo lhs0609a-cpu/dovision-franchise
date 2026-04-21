@@ -1,17 +1,17 @@
 // ============================================================
-// Path to Profit — 램프업 + 코호트 + 월별 P&L 시뮬레이션
+// Path to Profit — 6개월 선불 현금흐름 모델
 // ============================================================
-// 기존 steady-state 모델(-334만원 영원 가정)의 한계:
-//   - 개업 첫 달부터 3명 유지 전제 → 비현실적
-//   - 시간축이 없어 BEP 도달 시점·투자회수기간 제시 불가
+// 두비전은 "6개월 선불 480만원"으로 등록비를 일시불 수납합니다.
+// 따라서 매출을 월 80만원씩 분할 인식(accrual)하면 실제 현금흐름을
+// 심하게 과소 평가합니다 — 가맹점주 입장의 BEP·회수기간은 "통장에
+// 얼마가 들어오는가"로 결정되기 때문입니다.
 //
-// 이 모델은 직영 3개 센터(강남/반포/위례)의 6년치 경험치를
-// 두 개 곡선으로 요약:
-//   1) Ramp: 월별 신규등록 → S-curve로 steady에 수렴
-//   2) Cohort Retention: 등록 시점 대비 잔류율
+// 이 모델은 cash-basis:
+//   1) 신규 등록 발생 시점에 480만원 일시불 수납
+//   2) 등록 후 6개월 경과 시 retention 확률로 재등록(= 또 480만원)
+//   3) 활성회원 = 현재 선불 유효기간(6개월) 내 회원 수
 //
-// 가맹사업법 §9(허위·과장 광고 금지)를 고려해 보수/표준/공격
-// 3시나리오를 항상 동시 제시합니다.
+// 가맹사업법 §9 고지 의무 — 보수/표준/공격 3시나리오 + 가정 공개.
 // ============================================================
 
 export type Scenario = "conservative" | "standard" | "aggressive";
@@ -19,11 +19,15 @@ export type Scenario = "conservative" | "standard" | "aggressive";
 export type MonthlyProjection = {
   /** 개업 후 N개월차 (1 시작) */
   month: number;
-  /** 해당 월 신규 등록 (명) */
+  /** 해당 월 신규 등록 (브랜드 첫 수강, 명) */
   newSignups: number;
-  /** 월말 활성 회원 (유지 중인 누적 회원) */
+  /** 해당 월 재등록 (기존 회원이 6개월 후 재결제, 명) */
+  renewals: number;
+  /** 해당 월 총 등록 결제 건수 (신규 + 재등록) */
+  totalEnrollments: number;
+  /** 월말 활성 회원 (현재 선불 유효기간 내) */
   activeMembers: number;
-  /** 월 매출 (만원) — 회원 × 80만원 */
+  /** 월 매출 (만원) = 등록건수 × 480만원 */
   monthlyRevenue: number;
   /** 본사 공급원가 22.5% (만원) */
   monthlyCogs: number;
@@ -49,18 +53,21 @@ export type PathToProfit = {
   cumulative12M: number;
   /** 24개월 누적 순이익 (만원) */
   cumulative24M: number;
-  /** 초기 투자 1억 회수까지 걸리는 달 (누적 순이익 ≥ 10,000, null=24개월 내 미회수) */
+  /** 초기 투자 1억 회수까지 걸리는 달 (null=24개월 내 미회수) */
   paybackMonth: number | null;
   /** 피크 활성 회원 */
   peakActiveMembers: number;
 };
 
 // ============================================================
-// 상수 (직영 실적 기반 — 본사 관리자 페이지에서 편집 가능하게 추후 이관)
+// 상수 (직영 실적 기반 — 추후 본사 관리자 페이지에서 편집 가능하게 이관)
 // ============================================================
 
-/** 회원 1명 월 수업료 (만원) — 6개월 선불 480만원 ÷ 6 */
-const MONTHLY_FEE_PER_MEMBER = 80;
+/** 1회 등록 선불 결제액 (만원) — 6개월 수강권 */
+const ENROLLMENT_FEE = 480;
+
+/** 1개 등록이 커버하는 기간 (개월) */
+const ENROLLMENT_MONTHS = 6;
 
 /** 본사 공급원가 비율 (로열티 10% + 앱교재비 12.5%) */
 const COGS_RATIO = 0.225;
@@ -78,52 +85,31 @@ const MARKETING_BY_SCENARIO: Record<Scenario, number> = {
 /** 초기 투자금 (만원) — 가맹비·인테리어·교육비·보증금 합산 약 1억 */
 const INITIAL_INVESTMENT = 10000;
 
-// ============================================================
-// 코호트 유지 곡선 — 등록 후 N개월차 잔류율
-// ============================================================
-// 직영 평균: 1m=95%, 3m=85%, 6m=70%, 12m=50%, 18m=35%, 24m=25%
-// ------------------------------------------------------------
-
-function retention(monthsAfterSignup: number): number {
-  if (monthsAfterSignup <= 0) return 1;
-  // 지수 감쇠 기반 근사. R(m) = exp(-ln(2) * m / halfLife)
-  // halfLife ~ 12개월에서 50% 되도록
-  const halfLife = 12;
-  return Math.max(0, Math.exp((-Math.LN2 * monthsAfterSignup) / halfLife));
-}
+/** 6개월 수강 후 재등록 확률 (직영 평균) */
+const RENEWAL_RATE_6M = 0.65;
 
 // ============================================================
 // 램프 곡선 — 월별 신규 등록 수 (steady state에 수렴)
 // ============================================================
 
 /**
- * S-curve로 steady state에 수렴.
- * 마케팅 예산이 크면 ramp 속도가 빠르고 상한도 약간 올라감.
+ * S-curve로 steady state에 수렴. 마케팅 예산이 클수록 램프 속도·상한 증가.
  */
 function newSignupsAt(
   month: number,
   steadySignups: number,
   marketingBudget: number
 ): number {
-  // 램프 속도 k: 마케팅이 많을수록 빨리 찬다
-  //   150만원 → k ≈ 0.18 (느림)
-  //   250만원 → k ≈ 0.28
-  //   400만원 → k ≈ 0.40 (빠름)
+  // 램프 속도 k: 150만원→0.18 / 250만원→0.29 / 400만원→0.40
   const k = 0.10 + (marketingBudget / 400) * 0.30;
-
-  // 유입 상한 배수 — 마케팅이 충분하면 steady보다 약간 더 높을 수도 있음
-  //   150만원 → 0.75×
-  //   250만원 → 0.95×
-  //   400만원 → 1.15×
+  // 유입 상한 배수: 150만원→0.74 / 250만원→0.91 / 400만원→1.15
   const ceiling = 0.5 + (marketingBudget / 400) * 0.65;
   const effectiveSteady = steadySignups * ceiling;
-
-  // 첫 달은 홍보만, 신규 유입 거의 없음 → 1-exp(-k*m)으로 자연스레 처리
   return effectiveSteady * (1 - Math.exp(-k * month));
 }
 
 // ============================================================
-// 단일 시나리오 시뮬레이션
+// 단일 시나리오 시뮬레이션 (cash-basis)
 // ============================================================
 
 export function simulatePath(
@@ -136,22 +122,37 @@ export function simulatePath(
     marketingBudgetOverride ?? MARKETING_BY_SCENARIO[scenario];
 
   const monthly: MonthlyProjection[] = [];
-  // 코호트: index=등록된 월(1~m), value=최초 등록 인원
-  const cohorts: number[] = [];
+  // enrollments[m] = 해당 월에 (신규+재등록) 결제 건수. Index 0 = month 1.
+  const enrollments: number[] = [];
   let cumulativeProfit = 0;
 
   for (let m = 1; m <= monthCount; m++) {
+    // 1) 신규 등록 (신규 고객의 첫 결제)
     const newSignups = newSignupsAt(m, steadySignups, marketingBudget);
-    cohorts.push(newSignups);
 
-    // 월말 활성 회원 = 각 코호트의 retention 합
-    let activeMembers = 0;
-    for (let c = 0; c < cohorts.length; c++) {
-      const monthsSinceSignup = m - (c + 1); // cohort c는 c+1월에 등록
-      activeMembers += cohorts[c] * retention(monthsSinceSignup);
+    // 2) 재등록 — 6개월 전 등록 건 × retention
+    let renewals = 0;
+    if (m > ENROLLMENT_MONTHS) {
+      const origEnrollment = enrollments[m - ENROLLMENT_MONTHS - 1] ?? 0;
+      renewals = origEnrollment * RENEWAL_RATE_6M;
     }
 
-    const monthlyRevenue = activeMembers * MONTHLY_FEE_PER_MEMBER;
+    const totalEnrollments = newSignups + renewals;
+    enrollments.push(totalEnrollments);
+
+    // 3) 활성 회원 = 선불 유효기간(과거 6개월) 내 등록건의 총합
+    //    단, 각 등록건은 6개월간 1명으로 카운트
+    let activeMembers = 0;
+    for (
+      let idx = Math.max(0, m - ENROLLMENT_MONTHS);
+      idx < m;
+      idx++
+    ) {
+      activeMembers += enrollments[idx];
+    }
+
+    // 4) 현금 수입 (일시불)
+    const monthlyRevenue = totalEnrollments * ENROLLMENT_FEE;
     const monthlyCogs = monthlyRevenue * COGS_RATIO;
     const monthlyFixedCost = BASELINE_FIXED_COST;
     const monthlyMarketing = marketingBudget;
@@ -162,6 +163,8 @@ export function simulatePath(
     monthly.push({
       month: m,
       newSignups: round(newSignups, 1),
+      renewals: round(renewals, 1),
+      totalEnrollments: round(totalEnrollments, 1),
       activeMembers: round(activeMembers, 1),
       monthlyRevenue: round(monthlyRevenue),
       monthlyCogs: round(monthlyCogs),
@@ -214,8 +217,6 @@ export function simulateAllPaths(
   monthCount = 24,
   marketingOverride?: { standardBudget: number }
 ): PathToProfitBundle {
-  // 표준 예산 슬라이더를 움직이면 표준 시나리오만 교체하고,
-  // 보수/공격은 표준 대비 -100/+150 만원 오프셋
   const stdBudget =
     marketingOverride?.standardBudget ?? MARKETING_BY_SCENARIO.standard;
   const consBudget = Math.max(50, stdBudget - 100);
@@ -253,13 +254,15 @@ function round(v: number, decimals = 0): number {
 }
 
 // ============================================================
-// 내보낼 기본값 (UI 슬라이더·참고용)
+// 내보낼 상수 (UI 슬라이더·Accordion 참고용)
 // ============================================================
 
 export const RAMP_MODEL_CONSTANTS = {
-  MONTHLY_FEE_PER_MEMBER,
+  ENROLLMENT_FEE,
+  ENROLLMENT_MONTHS,
   COGS_RATIO,
   BASELINE_FIXED_COST,
   MARKETING_BY_SCENARIO,
   INITIAL_INVESTMENT,
+  RENEWAL_RATE_6M,
 } as const;
