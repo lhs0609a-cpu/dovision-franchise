@@ -114,25 +114,25 @@ export default function PathToProfitSection({ demand }: Props) {
         </div>
       </div>
 
-      {/* 메인 KPI 3개 (표준 시나리오) */}
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* 메인 KPI 4개 (표준 시나리오) */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           icon={<Target className="h-4 w-4" />}
           label="BEP 도달 시점"
           primary={std.bepMonth ? `${std.bepMonth}개월차` : "24개월 내 미도달"}
           sub={
             std.bepMonth
-              ? `월 순이익이 처음 흑자로 전환되는 시점`
-              : `현 입지는 마케팅·수업료 전략 재검토 권장`
+              ? `월 순이익이 처음 흑자로 전환`
+              : `마케팅·수업료 전략 재검토 필요`
           }
           tone={std.bepMonth && std.bepMonth <= 12 ? "success" : "warning"}
         />
         <KpiCard
           icon={<Wallet className="h-4 w-4" />}
-          label="12개월 누적 순이익"
-          primary={`${std.cumulative12M >= 0 ? "+" : ""}${std.cumulative12M.toLocaleString()}만원`}
-          sub={`표준 시나리오 (월 마케팅 ${std.marketingBudget}만원 기준)`}
-          tone={std.cumulative12M > 0 ? "success" : "danger"}
+          label="24개월 누적 순이익"
+          primary={`${std.cumulative24M >= 0 ? "+" : ""}${formatManwon(std.cumulative24M)}`}
+          sub={`2년간 누적 현금흐름 (월 마케팅 ${std.marketingBudget}만원)`}
+          tone={std.cumulative24M > 0 ? "success" : "danger"}
         />
         <KpiCard
           icon={<TrendingUp className="h-4 w-4" />}
@@ -142,12 +142,38 @@ export default function PathToProfitSection({ demand }: Props) {
               ? `${std.paybackMonth}개월`
               : `24개월 내 미회수`
           }
-          sub={`1억원 초기투자 (가맹비·인테리어·장비·교육비 기준)`}
+          sub={`1억원 초기투자 기준 (가맹·인테리어·장비·교육)`}
           tone={
             std.paybackMonth && std.paybackMonth <= 24 ? "success" : "warning"
           }
         />
+        <KpiCard
+          icon={<TrendingUp className="h-4 w-4" />}
+          label="안정기 월 순이익 (24M)"
+          primary={`${std.monthly[23]?.monthlyProfit >= 0 ? "+" : ""}${(std.monthly[23]?.monthlyProfit ?? 0).toLocaleString()}만원`}
+          sub={`24개월차 월 활성회원 ${std.peakActiveMembers}명 기준`}
+          tone={
+            (std.monthly[23]?.monthlyProfit ?? 0) > 0 ? "success" : "warning"
+          }
+        />
       </div>
+
+      {/* 초기 램프업 설명 배너 (마이너스 시점을 자연스럽게 맥락화) */}
+      {std.cumulative12M < 0 && std.bepMonth && (
+        <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50/70 p-3 text-[11.5px] leading-[1.65] text-blue-900">
+          <strong>📊 개업 초기 램프업 구간이 있습니다</strong> — BEP 도달까지의{" "}
+          {std.bepMonth}개월은 회원 확보·인지도 구축 기간으로 투자 단계입니다.
+          이 구간 누적 손실은{" "}
+          <strong>
+            {formatManwon(Math.abs(std.cumulative12M))}
+          </strong>{" "}
+          수준이며, {std.bepMonth}개월차 흑자 전환 후 빠르게 회복해{" "}
+          {std.paybackMonth
+            ? `${std.paybackMonth}개월차에 초기 투자 1억을 완전 회수`
+            : "24개월 내 회수"}
+          합니다.
+        </div>
+      )}
 
       {/* 누적 현금흐름 차트 */}
       <div className="mt-5 rounded-2xl border border-border/60 bg-white p-5 shadow-sm">
@@ -597,6 +623,16 @@ function AssumptionRow({
       <p className="mt-1 text-[11px] leading-[1.65]">{body}</p>
     </div>
   );
+}
+
+// 억/만원 단위로 예쁘게 포맷: 12345 → "1.2억원", 4321 → "4,321만원"
+function formatManwon(manwon: number): string {
+  const abs = Math.abs(manwon);
+  if (abs >= 10000) {
+    const 억 = manwon / 10000;
+    return `${억.toFixed(1)}억원`;
+  }
+  return `${manwon.toLocaleString()}만원`;
 }
 
 // Unused import avoid
