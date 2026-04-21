@@ -175,6 +175,8 @@ export async function GET(req: NextRequest) {
           studentCount:
             level === "초등" ? 650 : level === "중학교" ? 550 : 500,
           distanceM: Number(p.distance) || 0,
+          lat: Number(p.y),
+          lng: Number(p.x),
           address: p.road_address_name || p.address_name,
           placeUrl: p.place_url,
           estimated: true, // 학생수는 추정값임을 표시
@@ -185,6 +187,8 @@ export async function GET(req: NextRequest) {
       level: "초등" | "중학교" | "고등학교";
       studentCount: number;
       distanceM: number;
+      lat: number;
+      lng: number;
       address: string;
       placeUrl: string;
       estimated: boolean;
@@ -199,6 +203,8 @@ export async function GET(req: NextRequest) {
           category: cls.category,
           isCompetitor: cls.isCompetitor,
           distanceM: Number(p.distance) || 0,
+          lat: Number(p.y),
+          lng: Number(p.x),
           address: p.road_address_name || p.address_name,
           placeUrl: p.place_url,
         };
@@ -214,6 +220,8 @@ export async function GET(req: NextRequest) {
         avgPriceMillion: 0,
         avgPyeong: 0,
         distanceM: Number(p.distance) || 0,
+        lat: Number(p.y),
+        lng: Number(p.x),
         address: p.road_address_name || p.address_name,
         placeUrl: p.place_url,
         estimated: true,

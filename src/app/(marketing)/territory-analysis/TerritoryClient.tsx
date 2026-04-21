@@ -40,6 +40,7 @@ import type {
   TerritoryScore,
 } from "@/lib/territory/types";
 import LocationPickerMap from "@/components/territory/LocationPickerMap";
+import ResultMap from "@/components/territory/ResultMap";
 
 // ============================================================
 // 두비전 AI 상권분석 도구
@@ -558,16 +559,17 @@ function scoreLabel(key: string): string {
 
 function LocationSection({ analysis }: { analysis: TerritoryAnalysis }) {
   const { input, schools, academies } = analysis;
+  const hasCoords = input.lat != null && input.lng != null;
   return (
     <section className="mb-10">
       <SectionHeader
         icon={MapPin}
         eyebrow="LOCATION"
-        title="입지 위치 — SVG 시각화"
-        subtitle={`반경 ${input.radiusKm}km 이내 분석 · 정식 버전은 카카오맵 연동 예정`}
+        title="입지 위치"
+        subtitle={`반경 ${input.radiusKm}km 이내 실제 좌표 기반 시각화 · Kakao Maps`}
       />
-      <div className="mt-5 overflow-hidden rounded-2xl border border-border/60 bg-white shadow-sm">
-        <SvgMap analysis={analysis} />
+      <div className="mt-5 space-y-0 overflow-hidden rounded-2xl border border-border/60 bg-white shadow-sm">
+        {hasCoords ? <ResultMap analysis={analysis} /> : <SvgMap analysis={analysis} />}
         <div className="grid grid-cols-3 border-t border-border/60 text-center text-[12px] sm:text-[13px]">
           <div className="border-r border-border/60 p-3">
             <p className="text-muted-foreground">분석 주소</p>

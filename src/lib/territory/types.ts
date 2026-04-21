@@ -26,6 +26,9 @@ export type School = {
   studentCount: number;
   /** 후보 입지로부터의 직선거리 (m) */
   distanceM: number;
+  /** 실제 좌표 (실데이터일 때만, 지도 렌더링용) */
+  lat?: number;
+  lng?: number;
   /** 카카오 상세 주소 (실제 데이터일 때만) */
   address?: string;
   /** 카카오 장소 상세 URL (검증용, 실제 데이터일 때만) */
@@ -40,6 +43,8 @@ export type Academy = {
   /** 두비전과 직접 경쟁하는지 여부 */
   isCompetitor: boolean;
   distanceM: number;
+  lat?: number;
+  lng?: number;
   address?: string;
   placeUrl?: string;
 };
@@ -53,6 +58,8 @@ export type ApartmentCluster = {
   /** 평균 평형 (평) */
   avgPyeong: number;
   distanceM: number;
+  lat?: number;
+  lng?: number;
   address?: string;
   placeUrl?: string;
   estimated?: boolean;
