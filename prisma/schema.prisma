@@ -58,6 +58,7 @@ model Franchisee {
   contractSignatures        ContractSignature[]
   supervisorVisits          SupervisorVisit[]
   trainingCompletions       TrainingCompletion[]
+  tickets                   Ticket[]
 }
 
 enum FranchiseeStatus {
@@ -219,6 +220,65 @@ model AuditLog {
   @@index([createdAt])
   @@index([actorId, actorType])
   @@index([action])
+}
+
+// ============================================================
+// CS 티켓 시스템
+// ============================================================
+
+enum TicketCategory {
+  OPERATIONS        // 운영·관리
+  SYSTEM            // 시스템·장비
+  EDUCATION         // 교육·커리큘럼
+  MARKETING         // 마케팅·홍보
+  FINANCE           // 수납·정산
+  OTHER             // 기타
+}
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN              // 접수
+  IN_PROGRESS       // 처리 중
+  WAITING           // 가맹점주 회신 대기
+  RESOLVED          // 해결됨
+  CLOSED            // 종료
+}
+
+model Ticket {
+  id           String          @id @default(cuid())
+  franchiseeId String
+  franchisee   Franchisee      @relation(fields: [franchiseeId], references: [id], onDelete: Cascade)
+  subject      String
+  category     TicketCategory  @default(OPERATIONS)
+  priority     TicketPriority  @default(NORMAL)
+  status       TicketStatus    @default(OPEN)
+  assigneeId   String?                       // AdminUser.id
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  closedAt     DateTime?
+  messages     TicketMessage[]
+
+  @@index([status])
+  @@index([franchiseeId])
+}
+
+model TicketMessage {
+  id         String   @id @default(cuid())
+  ticketId   String
+  ticket     Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId   String                           // AdminUser.id 또는 Franchisee.id
+  authorType String                           // "admin" | "franchisee"
+  authorName String                           // 캐시
+  body       String
+  createdAt  DateTime @default(now())
+
+  @@index([ticketId])
 }
 
 enum InquiryStatus {

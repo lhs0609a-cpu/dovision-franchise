@@ -18,7 +18,11 @@ export type Feature =
   | "testimonials"
   | "faq"
   | "notices"
-  | "settings";
+  | "settings"
+  | "advisor"
+  | "predictions"
+  | "reports"
+  | "tickets";
 
 // 각 기능별 접근 가능 역할
 const FEATURE_ACCESS: Record<Feature, AdminRole[]> = {
@@ -38,6 +42,14 @@ const FEATURE_ACCESS: Record<Feature, AdminRole[]> = {
   // 운영
   visits: ["SUPER_ADMIN", "ADMIN", "SUPERVISOR"],
   training: ["SUPER_ADMIN", "ADMIN", "EDUCATION"],
+
+  // 지능형 도구
+  advisor: ["SUPER_ADMIN", "ADMIN", "SUPERVISOR", "SALES"],
+  predictions: ["SUPER_ADMIN", "ADMIN", "SUPERVISOR", "FINANCE"],
+  reports: ["SUPER_ADMIN", "ADMIN", "FINANCE"],
+
+  // CS
+  tickets: ["SUPER_ADMIN", "ADMIN", "SUPERVISOR", "SALES"],
 
   // 시스템
   audit: ["SUPER_ADMIN"],
@@ -70,6 +82,10 @@ export function pathToFeature(path: string): Feature | null {
   if (path.startsWith("/admin/faq")) return "faq";
   if (path.startsWith("/admin/notices")) return "notices";
   if (path.startsWith("/admin/settings")) return "settings";
+  if (path.startsWith("/admin/advisor")) return "advisor";
+  if (path.startsWith("/admin/predictions")) return "predictions";
+  if (path.startsWith("/admin/reports")) return "reports";
+  if (path.startsWith("/admin/tickets")) return "tickets";
   return null;
 }
 

@@ -42,6 +42,12 @@ export default async function PortalLayout({
                 >
                   가맹계약서
                 </Link>
+                <Link
+                  href="/portal/tickets"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  CS 문의
+                </Link>
               </nav>
             )}
           </div>

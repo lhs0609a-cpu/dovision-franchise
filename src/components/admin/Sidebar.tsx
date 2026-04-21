@@ -19,6 +19,10 @@ import {
   ClipboardCheck,
   GraduationCap,
   History,
+  Sparkles,
+  TrendingUp,
+  FilePlus2,
+  MessageCircleQuestion,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -94,6 +98,18 @@ const NAV: NavGroup[] = [
         label: "본사 수익",
         feature: "revenue",
       },
+      {
+        href: "/admin/predictions",
+        icon: TrendingUp,
+        label: "예측 분석",
+        feature: "predictions",
+      },
+      {
+        href: "/admin/reports/monthly",
+        icon: FilePlus2,
+        label: "월간 리포트",
+        feature: "reports",
+      },
     ],
   },
   {
@@ -110,6 +126,28 @@ const NAV: NavGroup[] = [
         icon: GraduationCap,
         label: "교육 이수",
         feature: "training",
+      },
+    ],
+  },
+  {
+    label: "지능형 도구",
+    items: [
+      {
+        href: "/admin/advisor",
+        icon: Sparkles,
+        label: "AI 어드바이저",
+        feature: "advisor",
+      },
+    ],
+  },
+  {
+    label: "CS",
+    items: [
+      {
+        href: "/admin/tickets",
+        icon: MessageCircleQuestion,
+        label: "CS 티켓",
+        feature: "tickets",
       },
     ],
   },
