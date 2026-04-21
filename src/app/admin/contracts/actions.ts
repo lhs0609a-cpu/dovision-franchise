@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { del } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
+import { writeAudit } from "@/lib/admin/audit";
 
 async function requireAdmin() {
   const session = await auth();
@@ -14,6 +15,7 @@ async function requireAdmin() {
 
 export async function activateContract(templateId: string) {
   await requireAdmin();
+  const t = await prisma.contractTemplate.findUnique({ where: { id: templateId } });
   await prisma.$transaction([
     prisma.contractTemplate.updateMany({
       where: { isActive: true },
@@ -24,14 +26,27 @@ export async function activateContract(templateId: string) {
       data: { isActive: true },
     }),
   ]);
+  await writeAudit({
+    action: "contract.activate",
+    entityType: "Contract",
+    entityId: templateId,
+    meta: { version: t?.version },
+  });
   revalidatePath("/admin/contracts");
 }
 
 export async function deactivateContract(templateId: string) {
   await requireAdmin();
+  const t = await prisma.contractTemplate.findUnique({ where: { id: templateId } });
   await prisma.contractTemplate.update({
     where: { id: templateId },
     data: { isActive: false },
+  });
+  await writeAudit({
+    action: "contract.deactivate",
+    entityType: "Contract",
+    entityId: templateId,
+    meta: { version: t?.version },
   });
   revalidatePath("/admin/contracts");
 }
@@ -55,6 +70,12 @@ export async function deleteContract(templateId: string) {
     // blob already gone or deletion failed — not critical
   }
   await prisma.contractTemplate.delete({ where: { id: templateId } });
+  await writeAudit({
+    action: "contract.delete",
+    entityType: "Contract",
+    entityId: templateId,
+    meta: { version: t.version, title: t.title },
+  });
   revalidatePath("/admin/contracts");
 }
 

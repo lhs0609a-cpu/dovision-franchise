@@ -36,10 +36,11 @@ type Alert = {
 type Props = {
   userName: string;
   userEmail: string;
+  roleLabel?: string;
   alerts: Alert[];
 };
 
-export default function TopBar({ userName, userEmail, alerts }: Props) {
+export default function TopBar({ userName, userEmail, roleLabel, alerts }: Props) {
   const router = useRouter();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -190,6 +191,11 @@ export default function TopBar({ userName, userEmail, alerts }: Props) {
                   <p className="text-[10.5px] text-muted-foreground">
                     {userEmail}
                   </p>
+                  {roleLabel && (
+                    <span className="mt-1.5 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[9.5px] font-bold text-primary">
+                      {roleLabel}
+                    </span>
+                  )}
                 </div>
                 <div className="p-1">
                   <button

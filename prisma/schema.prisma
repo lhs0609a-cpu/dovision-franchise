@@ -56,6 +56,8 @@ model Franchisee {
   progress                  ChecklistProgress[]
   documents                 FranchiseeDocument[]
   contractSignatures        ContractSignature[]
+  supervisorVisits          SupervisorVisit[]
+  trainingCompletions       TrainingCompletion[]
 }
 
 enum FranchiseeStatus {
@@ -143,6 +145,82 @@ model ContractSignature {
   @@unique([franchiseeId, templateId])
 }
 
+// ============================================================
+// SV(슈퍼바이저) 방문 관리
+// ============================================================
+
+model SupervisorVisit {
+  id            String      @id @default(cuid())
+  supervisorId  String
+  supervisor    AdminUser   @relation(fields: [supervisorId], references: [id])
+  franchiseeId  String
+  franchisee    Franchisee  @relation(fields: [franchiseeId], references: [id], onDelete: Cascade)
+  scheduledAt   DateTime                  // 방문 예정일
+  visitedAt     DateTime?                 // 실제 방문 시각 (null = 미완료)
+  summary       String?                   // 방문 요약
+  issues        String?                   // 발견된 이슈
+  nextAction    String?                   // 다음 액션
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([scheduledAt])
+  @@index([franchiseeId])
+}
+
+// ============================================================
+// 교육 이수 관리
+// ============================================================
+
+model TrainingCurriculum {
+  id          String                @id @default(cuid())
+  code        String                @unique    // "IMAGE_MEMORY_BASIC"
+  title       String
+  category    String                           // "원장" | "강사" | "행정" | "법정"
+  isRequired  Boolean @default(true)
+  order       Int     @default(0)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  completions TrainingCompletion[]
+}
+
+model TrainingCompletion {
+  id             String              @id @default(cuid())
+  franchiseeId   String
+  franchisee     Franchisee          @relation(fields: [franchiseeId], references: [id], onDelete: Cascade)
+  curriculumId   String
+  curriculum     TrainingCurriculum  @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  completedAt    DateTime                      // 수료 시점
+  certificateUrl String?                       // 수료증 이미지/PDF URL
+  verifiedAt     DateTime?                     // 본사 검증 시각
+  note           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([franchiseeId, curriculumId])
+}
+
+// ============================================================
+// Audit Log (감사 추적)
+// ============================================================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorId     String                         // AdminUser.id 또는 Franchisee.id
+  actorType   String                         // "admin" | "franchisee"
+  actorName   String                         // 캐시 (사용자 삭제돼도 로그 보존)
+  action      String                         // "contract.activate" 등 dot-notation
+  entityType  String?                        // "Contract" | "Franchisee" | "Inquiry" 등
+  entityId    String?
+  meta        Json?                          // 추가 컨텍스트 (old/new value)
+  ip          String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorId, actorType])
+  @@index([action])
+}
+
 enum InquiryStatus {
   NEW
   CONTACTED
@@ -153,17 +231,24 @@ enum InquiryStatus {
 }
 
 model AdminUser {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  password  String
-  name      String
-  role      AdminRole @default(ADMIN)
-  createdAt DateTime  @default(now())
+  id              String            @id @default(cuid())
+  email           String            @unique
+  password        String
+  name            String
+  role            AdminRole         @default(ADMIN)
+  // SUPERVISOR 전용: 담당 지역 (예: ["경기 성남", "서울 강남"]). 비어 있으면 전국.
+  assignedRegions String[]          @default([])
+  createdAt       DateTime          @default(now())
+  visits          SupervisorVisit[]
 }
 
 enum AdminRole {
   SUPER_ADMIN
-  ADMIN
+  SUPERVISOR       // SV — 담당 지역 가맹점 방문·리포트
+  SALES            // 영업 — 문의·상담·계약까지
+  EDUCATION        // 교육 — 교육 이수 관리만
+  FINANCE          // 재무 — 수익 읽기 전용
+  ADMIN            // legacy / 일반 관리자
 }
 
 model Testimonial {

@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { writeAudit } from "@/lib/admin/audit";
 
 async function requireFranchisee() {
   const session = await auth();
@@ -57,6 +58,12 @@ export async function agreeToContract(templateId: string) {
   await prisma.contractSignature.update({
     where: { id: row.id },
     data: { agreedAt: new Date(), agreementIp: ip, viewedAt: row.viewedAt ?? new Date() },
+  });
+  await writeAudit({
+    action: "contract.agree",
+    entityType: "Contract",
+    entityId: templateId,
+    meta: { franchiseeId, ip },
   });
   revalidatePath("/portal/contract");
   revalidatePath("/portal");

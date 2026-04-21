@@ -2,6 +2,7 @@ import Sidebar from "@/components/admin/Sidebar";
 import TopBar from "@/components/admin/TopBar";
 import { auth } from "@/lib/auth";
 import { collectAdminAlerts } from "@/lib/admin/alerts";
+import { ROLE_LABELS } from "@/lib/admin/rbac";
 import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
@@ -14,15 +15,17 @@ export default async function AdminLayout({
     redirect("/portal");
   }
   const alerts = session ? await collectAdminAlerts() : [];
+  const role = session?.user.role;
 
   return (
     <div className="flex h-screen overflow-hidden bg-muted/20">
-      <Sidebar />
+      <Sidebar role={role} />
       <div className="flex min-w-0 flex-1 flex-col">
         {session && (
           <TopBar
             userName={session.user.name}
             userEmail={session.user.email}
+            roleLabel={role ? ROLE_LABELS[role] : undefined}
             alerts={alerts}
           />
         )}

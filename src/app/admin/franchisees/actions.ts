@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { writeAudit } from "@/lib/admin/audit";
 
 async function requireAdmin() {
   const session = await auth();
@@ -51,6 +52,12 @@ export async function createFranchiseeFromInquiry(formData: FormData) {
     where: { id: inquiryId },
     data: { status: "CONTRACTED" },
   });
+  await writeAudit({
+    action: "franchisee.create",
+    entityType: "Franchisee",
+    entityId: franchisee.id,
+    meta: { name: franchisee.name, region: franchisee.region, fromInquiryId: inquiryId },
+  });
   revalidatePath("/admin/franchisees");
   redirect(`/admin/franchisees/${franchisee.id}`);
 }
@@ -89,12 +96,22 @@ export async function setFranchiseeStatus(
   status: "ONBOARDING" | "OPERATING" | "SUSPENDED" | "TERMINATED"
 ) {
   await requireAdmin();
+  const before = await prisma.franchisee.findUnique({
+    where: { id: franchiseeId },
+    select: { status: true, name: true },
+  });
   await prisma.franchisee.update({
     where: { id: franchiseeId },
     data: {
       status,
       openedAt: status === "OPERATING" ? new Date() : undefined,
     },
+  });
+  await writeAudit({
+    action: "franchisee.status.change",
+    entityType: "Franchisee",
+    entityId: franchiseeId,
+    meta: { from: before?.status, to: status, name: before?.name },
   });
   revalidatePath(`/admin/franchisees/${franchiseeId}`);
   revalidatePath("/admin/franchisees");

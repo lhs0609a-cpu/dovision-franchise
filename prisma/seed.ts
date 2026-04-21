@@ -1,6 +1,7 @@
 import { PrismaClient } from "../src/generated/prisma/client";
 import bcrypt from "bcryptjs";
 import { CHECKLIST_ITEMS } from "../src/lib/checklist";
+import { TRAINING_CURRICULA } from "../src/lib/admin/training-seed";
 
 const prisma = new PrismaClient();
 
@@ -81,6 +82,29 @@ async function main() {
     });
   }
   console.log(`${CHECKLIST_ITEMS.length} checklist templates upserted`);
+
+  // 교육 커리큘럼 (upsert — 멱등)
+  for (const t of TRAINING_CURRICULA) {
+    await prisma.trainingCurriculum.upsert({
+      where: { code: t.code },
+      update: {
+        title: t.title,
+        category: t.category,
+        isRequired: t.isRequired,
+        order: t.order,
+        description: t.description ?? null,
+      },
+      create: {
+        code: t.code,
+        title: t.title,
+        category: t.category,
+        isRequired: t.isRequired,
+        order: t.order,
+        description: t.description ?? null,
+      },
+    });
+  }
+  console.log(`${TRAINING_CURRICULA.length} training curricula upserted`);
 
   console.log("Seed completed!");
 }

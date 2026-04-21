@@ -16,14 +16,20 @@ import {
   Settings,
   Star,
   ExternalLink,
+  ClipboardCheck,
+  GraduationCap,
+  History,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { AdminRole } from "@/lib/auth";
+import { canAccess, type Feature } from "@/lib/admin/rbac";
 
 type NavItem = {
   href: string;
   icon: LucideIcon;
   label: string;
+  feature: Feature;
   badge?: string;
 };
 
@@ -36,38 +42,115 @@ const NAV: NavGroup[] = [
   {
     label: "OVERVIEW",
     items: [
-      { href: "/admin", icon: LayoutDashboard, label: "대시보드" },
-      { href: "/admin/map", icon: Map, label: "전국 가맹점 지도" },
+      {
+        href: "/admin",
+        icon: LayoutDashboard,
+        label: "대시보드",
+        feature: "dashboard",
+      },
+      {
+        href: "/admin/map",
+        icon: Map,
+        label: "전국 가맹점 지도",
+        feature: "map",
+      },
     ],
   },
   {
     label: "가맹사업",
     items: [
-      { href: "/admin/inquiries", icon: MessageSquare, label: "문의 관리" },
-      { href: "/admin/pipeline", icon: Kanban, label: "파이프라인" },
-      { href: "/admin/franchisees", icon: Building2, label: "가맹점 관리" },
-      { href: "/admin/contracts", icon: FileText, label: "가맹계약서" },
+      {
+        href: "/admin/inquiries",
+        icon: MessageSquare,
+        label: "문의 관리",
+        feature: "inquiries",
+      },
+      {
+        href: "/admin/pipeline",
+        icon: Kanban,
+        label: "파이프라인",
+        feature: "pipeline",
+      },
+      {
+        href: "/admin/franchisees",
+        icon: Building2,
+        label: "가맹점 관리",
+        feature: "franchisees",
+      },
+      {
+        href: "/admin/contracts",
+        icon: FileText,
+        label: "가맹계약서",
+        feature: "contracts",
+      },
     ],
   },
   {
     label: "영업·성과",
-    items: [{ href: "/admin/revenue", icon: Wallet, label: "본사 수익" }],
+    items: [
+      {
+        href: "/admin/revenue",
+        icon: Wallet,
+        label: "본사 수익",
+        feature: "revenue",
+      },
+    ],
+  },
+  {
+    label: "운영 관리",
+    items: [
+      {
+        href: "/admin/visits",
+        icon: ClipboardCheck,
+        label: "SV 방문 관리",
+        feature: "visits",
+      },
+      {
+        href: "/admin/training",
+        icon: GraduationCap,
+        label: "교육 이수",
+        feature: "training",
+      },
+    ],
   },
   {
     label: "마케팅 콘텐츠",
     items: [
-      { href: "/admin/testimonials", icon: Star, label: "성과사례" },
-      { href: "/admin/faq", icon: HelpCircle, label: "FAQ" },
-      { href: "/admin/notices", icon: Bell, label: "공지사항" },
+      {
+        href: "/admin/testimonials",
+        icon: Star,
+        label: "성과사례",
+        feature: "testimonials",
+      },
+      { href: "/admin/faq", icon: HelpCircle, label: "FAQ", feature: "faq" },
+      {
+        href: "/admin/notices",
+        icon: Bell,
+        label: "공지사항",
+        feature: "notices",
+      },
     ],
   },
   {
     label: "시스템",
-    items: [{ href: "/admin/settings", icon: Settings, label: "설정" }],
+    items: [
+      {
+        href: "/admin/audit",
+        icon: History,
+        label: "감사 로그",
+        feature: "audit",
+      },
+      {
+        href: "/admin/settings",
+        icon: Settings,
+        label: "설정",
+        feature: "settings",
+      },
+    ],
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ role }: { role?: AdminRole }) {
   const pathname = usePathname();
 
   return (
@@ -92,47 +175,53 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {NAV.map((group) => (
-          <div key={group.label} className="mb-5">
-            <p className="px-2 pb-1.5 text-[9.5px] font-bold tracking-[0.15em] text-muted-foreground/70">
-              {group.label}
-            </p>
-            <div className="space-y-0.5">
-              {group.items.map((item) => {
-                const isActive =
-                  pathname === item.href ||
-                  (item.href !== "/admin" && pathname.startsWith(item.href));
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "group flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    )}
-                  >
-                    <span className="flex items-center gap-2">
-                      <item.icon
-                        className={cn(
-                          "h-3.5 w-3.5 shrink-0",
-                          isActive ? "text-primary" : ""
-                        )}
-                      />
-                      {item.label}
-                    </span>
-                    {item.badge && (
-                      <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold text-white">
-                        {item.badge}
+        {NAV.map((group) => {
+          const visibleItems = group.items.filter((item) =>
+            canAccess(item.feature, role)
+          );
+          if (visibleItems.length === 0) return null;
+          return (
+            <div key={group.label} className="mb-5">
+              <p className="px-2 pb-1.5 text-[9.5px] font-bold tracking-[0.15em] text-muted-foreground/70">
+                {group.label}
+              </p>
+              <div className="space-y-0.5">
+                {visibleItems.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/admin" && pathname.startsWith(item.href));
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "group flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
+                        isActive
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      )}
+                    >
+                      <span className="flex items-center gap-2">
+                        <item.icon
+                          className={cn(
+                            "h-3.5 w-3.5 shrink-0",
+                            isActive ? "text-primary" : ""
+                          )}
+                        />
+                        {item.label}
                       </span>
-                    )}
-                  </Link>
-                );
-              })}
+                      {item.badge && (
+                        <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold text-white">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </nav>
 
       {/* Footer */}

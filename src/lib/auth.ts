@@ -4,6 +4,13 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
 export type UserType = "admin" | "franchisee";
+export type AdminRole =
+  | "SUPER_ADMIN"
+  | "SUPERVISOR"
+  | "SALES"
+  | "EDUCATION"
+  | "FINANCE"
+  | "ADMIN";
 
 declare module "next-auth" {
   interface Session {
@@ -12,10 +19,14 @@ declare module "next-auth" {
       email: string;
       name: string;
       userType: UserType;
+      role?: AdminRole;
+      assignedRegions?: string[];
     };
   }
   interface User {
     userType?: UserType;
+    role?: AdminRole;
+    assignedRegions?: string[];
   }
 }
 
@@ -47,7 +58,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           };
         }
 
-        // default: admin
         const user = await prisma.adminUser.findUnique({ where: { email } });
         if (!user) return null;
         const ok = await bcrypt.compare(password, user.password);
@@ -57,6 +67,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.email,
           name: user.name,
           userType: "admin" as const,
+          role: user.role as AdminRole,
+          assignedRegions: user.assignedRegions ?? [],
         };
       },
     }),
@@ -72,6 +84,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id as string;
         token.userType = (user.userType ?? "admin") as UserType;
+        if (user.userType === "admin") {
+          token.role = user.role ?? "ADMIN";
+          token.assignedRegions = user.assignedRegions ?? [];
+        }
       }
       return token;
     },
@@ -79,6 +95,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         session.user.userType = token.userType as UserType;
+        if (session.user.userType === "admin") {
+          session.user.role = (token.role as AdminRole) ?? "ADMIN";
+          session.user.assignedRegions =
+            (token.assignedRegions as string[]) ?? [];
+        }
       }
       return session;
     },
