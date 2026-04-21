@@ -2,86 +2,149 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   MessageSquare,
-  Star,
+  Building2,
+  FileText,
+  Map,
+  Kanban,
+  Wallet,
+  Award,
   HelpCircle,
   Bell,
   Settings,
-  LogOut,
+  Star,
   ExternalLink,
-  Building2,
-  FileText,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
-const navItems = [
-  { href: "/admin", icon: LayoutDashboard, label: "대시보드" },
-  { href: "/admin/inquiries", icon: MessageSquare, label: "문의 관리" },
-  { href: "/admin/franchisees", icon: Building2, label: "가맹점 관리" },
-  { href: "/admin/contracts", icon: FileText, label: "가맹계약서" },
-  { href: "/admin/testimonials", icon: Star, label: "성과사례" },
-  { href: "/admin/faq", icon: HelpCircle, label: "FAQ" },
-  { href: "/admin/notices", icon: Bell, label: "공지사항" },
-  { href: "/admin/settings", icon: Settings, label: "설정" },
+type NavItem = {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+  badge?: string;
+};
+
+type NavGroup = {
+  label: string;
+  items: NavItem[];
+};
+
+const NAV: NavGroup[] = [
+  {
+    label: "OVERVIEW",
+    items: [
+      { href: "/admin", icon: LayoutDashboard, label: "대시보드" },
+      { href: "/admin/map", icon: Map, label: "전국 가맹점 지도" },
+    ],
+  },
+  {
+    label: "가맹사업",
+    items: [
+      { href: "/admin/inquiries", icon: MessageSquare, label: "문의 관리" },
+      { href: "/admin/pipeline", icon: Kanban, label: "파이프라인" },
+      { href: "/admin/franchisees", icon: Building2, label: "가맹점 관리" },
+      { href: "/admin/contracts", icon: FileText, label: "가맹계약서" },
+    ],
+  },
+  {
+    label: "영업·성과",
+    items: [{ href: "/admin/revenue", icon: Wallet, label: "본사 수익" }],
+  },
+  {
+    label: "마케팅 콘텐츠",
+    items: [
+      { href: "/admin/testimonials", icon: Star, label: "성과사례" },
+      { href: "/admin/faq", icon: HelpCircle, label: "FAQ" },
+      { href: "/admin/notices", icon: Bell, label: "공지사항" },
+    ],
+  },
+  {
+    label: "시스템",
+    items: [{ href: "/admin/settings", icon: Settings, label: "설정" }],
+  },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r bg-card">
-      <div className="border-b p-4">
-        <Link href="/admin" className="text-lg font-bold text-primary">
-          DOVISION
-        </Link>
-        <p className="text-xs text-muted-foreground">관리자 패널</p>
+    <aside className="flex h-screen w-60 flex-col border-r bg-white">
+      {/* Brand */}
+      <div className="flex h-14 items-center gap-2 border-b px-4">
+        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-purple-500 to-purple-700">
+          <Award className="h-4 w-4 text-white" />
+        </div>
+        <div>
+          <Link
+            href="/admin"
+            className="block text-[13px] font-bold leading-tight text-foreground"
+          >
+            DOVISION HQ
+          </Link>
+          <p className="text-[9.5px] leading-tight text-muted-foreground">
+            가맹본부 운영시스템
+          </p>
+        </div>
       </div>
 
-      <nav className="flex-1 space-y-1 p-3">
-        {navItems.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/admin" && pathname.startsWith(item.href));
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
-              )}
-            >
-              <item.icon className="h-4 w-4" />
-              {item.label}
-            </Link>
-          );
-        })}
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        {NAV.map((group) => (
+          <div key={group.label} className="mb-5">
+            <p className="px-2 pb-1.5 text-[9.5px] font-bold tracking-[0.15em] text-muted-foreground/70">
+              {group.label}
+            </p>
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/admin" && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "group flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                  >
+                    <span className="flex items-center gap-2">
+                      <item.icon
+                        className={cn(
+                          "h-3.5 w-3.5 shrink-0",
+                          isActive ? "text-primary" : ""
+                        )}
+                      />
+                      {item.label}
+                    </span>
+                    {item.badge && (
+                      <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold text-white">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      <div className="border-t p-3 space-y-1">
+      {/* Footer */}
+      <div className="border-t p-3">
         <Link
           href="/"
           target="_blank"
-          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+          className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[11.5px] text-muted-foreground hover:bg-muted hover:text-foreground"
         >
-          <ExternalLink className="h-4 w-4" />
-          사이트 보기
+          <ExternalLink className="h-3.5 w-3.5" />
+          고객 사이트 보기
         </Link>
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-3 px-3 text-sm text-muted-foreground"
-          onClick={() => signOut({ callbackUrl: "/login" })}
-        >
-          <LogOut className="h-4 w-4" />
-          로그아웃
-        </Button>
       </div>
     </aside>
   );
